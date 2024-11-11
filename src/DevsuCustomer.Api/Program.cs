@@ -8,6 +8,7 @@ builder.Services.AddSwaggerGen();
 builder.AddApplicationServices();
 
 var app = builder.Build();
+app.AddApiMiddlewareException();
 app.MapCustomerApi();
 
 if (app.Environment.IsDevelopment())
