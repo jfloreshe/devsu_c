@@ -17,13 +17,16 @@ public static class CustomerApi
         var api = app.MapGroup(Routes.GroupName);
 
         api.MapPost("/", CreateCustomer);
-        api.MapGet("/", GetCustomer);
+        api.MapGet("/{clienteId:guid}", GetCustomer);
     }
-    public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx)
+    public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, ICustomerRepository customerRepository)
     {
         var newCustomer = new Customer(request.Identificacion, request.Nombre, request.Genero, request.Edad,
             request.Direccion, request.Telefono, request.Contrasena, true);
         newCustomer.CustomerId = Guid.NewGuid();
+        
+        customerRepository.AddCustomer(newCustomer);
+        await customerRepository.SaveEntities();
         
         var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.GroupName}/{newCustomer.CustomerId}";
         return TypedResults.Created(location, new CreateCustomerResult
@@ -33,9 +36,10 @@ public static class CustomerApi
         });
     }
 
-    public static async Task<Ok> GetCustomer()
+    public static async Task<Ok<Customer>> GetCustomer([FromRoute] Guid clienteId, ICustomerRepository customerRepository)
     {
-        return TypedResults.Ok();
+        var customer = await customerRepository.FindCustomer(clienteId);
+        return TypedResults.Ok(customer);
     }
 
 }
