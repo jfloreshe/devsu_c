@@ -23,11 +23,25 @@ public static class CustomerApi
         api.MapDelete("/{clienteId:guid}", DeleteCustomer);
         api.MapPatch("/", PatchCustomer);
     }
-    public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, IMediator mediator)
+    public static async Task<Results<
+        Created<CreateCustomerResult>,
+        Conflict<ProblemDetails>,
+        UnprocessableEntity<ProblemDetails>>> 
+        CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, IMediator mediator)
     {
         var result = await mediator.Send(request);
         if (result.IsFailure)
         {
+            if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)
+            {
+                return TypedResults.UnprocessableEntity(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            
             return TypedResults.Conflict(new ProblemDetails
             {
                 Title = result.Error.Title,

@@ -47,7 +47,7 @@ public class CreateCustomerRequestHandler : IRequestHandler<CreateCustomerReques
             return Result<CreateCustomerResult>.Failure(CreateCustomerErrors.ExistingCustomer(customer.PersonalIdentifier));
         }
 
-        var newCustomer = Customer.Create(
+        var newCustomerResult = Customer.Create(
             personIdentifier: request.Identificacion,
             name: request.Nombre,
             gender: request.Genero,
@@ -56,6 +56,13 @@ public class CreateCustomerRequestHandler : IRequestHandler<CreateCustomerReques
             phone: request.Telefono,
             password: request.Contrasena,
             state: request.Estado);
+        
+        if (newCustomerResult.IsFailure)
+        {
+            return Result<CreateCustomerResult>.Failure(newCustomerResult.Error);            
+        }
+
+        var newCustomer = newCustomerResult.Value;
 
         _customerRepository.AddCustomer(newCustomer);
 
