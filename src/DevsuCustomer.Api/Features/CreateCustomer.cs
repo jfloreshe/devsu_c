@@ -46,18 +46,15 @@ public class CreateCustomerRequestHandler : IRequestHandler<CreateCustomerReques
             return Result<CreateCustomerResult>.Failure(CreateCustomerErrors.ExistingCustomer(customer.PersonalIdentifier));
         }
 
-        Customer newCustomer = new (
-            request.Identificacion,
-            request.Nombre,
-            request.Genero,
-            request.Edad,
-            request.Direccion,
-            request.Telefono,
-            request.Contrasena,
-            true)
-        {
-            CustomerId = Guid.NewGuid()
-        };
+        var newCustomer = Customer.Create(
+            personIdentifier: request.Identificacion,
+            name: request.Nombre,
+            gender: request.Genero,
+            age: request.Edad,
+            address: request.Direccion,
+            phone: request.Telefono,
+            password: request.Contrasena,
+            state: true);
 
         _customerRepository.AddCustomer(newCustomer);
 
