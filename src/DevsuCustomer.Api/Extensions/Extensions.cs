@@ -12,7 +12,9 @@ public static class Extensions
     public static void AddApplicationServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(Program)));
-        builder.Services.AddDbContext<CustomerDbContext>(o => o.UseInMemoryDatabase("DevsuCustomers"));
+        // builder.Services.AddDbContext<CustomerDbContext>(o => o.UseInMemoryDatabase("DevsuCustomers"));
+        builder.Services.AddDbContext<CustomerDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DevsuCustomerDb")));
         builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
     }
 

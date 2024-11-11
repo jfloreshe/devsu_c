@@ -1,0 +1,17 @@
+﻿services:
+
+  mssql:
+    container_name: mssql-db
+    hostname: mssql-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: Passw0rd
+      MSSQL_DATA_DIR: /var/opt/mssql/data
+      MSSQL_PID: Express
+      MSSQL_TCP_PORT: 1433
+    ports:
+      - "1433:1433"
+    volumes:
+      - D:\docker-volume\sqlserver-db\data:/var/opt/mssql/data
+      - D:\docker-volume\sqlserver-db\logs:/var/opt/mssql/logs
