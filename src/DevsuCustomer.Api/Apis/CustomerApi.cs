@@ -20,6 +20,7 @@ public static class CustomerApi
         api.MapPost("/", CreateCustomer);
         api.MapGet("/{clienteId:guid}", GetCustomer);
         api.MapPut("/", UpdateCustomer);
+        api.MapDelete("/{clienteId:guid}", DeleteCustomer);
     }
     public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, IMediator mediator)
     {
@@ -56,6 +57,25 @@ public static class CustomerApi
     public static async Task<Results<NoContent, NotFound<ProblemDetails>>> UpdateCustomer([FromBody] UpdateCustomerRequest request, IMediator mediator)
     {
         var result = await mediator.Send(request);
+        if (result.IsFailure)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        return TypedResults.NoContent();
+    }
+    
+    public static async Task<Results<NoContent, NotFound<ProblemDetails>>> DeleteCustomer([FromRoute] Guid clienteId, IMediator mediator)
+    {
+        //This makes a hard delete (be careful using it)
+        //In case you need soft delete use PatchCustomer or UpdateCustomer changing the state should be enough
+        
+        var result = await mediator.Send(new DeleteCustomerRequest { CustomerId = clienteId });
         if (result.IsFailure)
         {
             return TypedResults.NotFound(new ProblemDetails

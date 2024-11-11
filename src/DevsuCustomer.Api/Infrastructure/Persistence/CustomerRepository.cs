@@ -22,6 +22,11 @@ public class CustomerRepository : ICustomerRepository
         _ctx.Customers.Update(customer);
     }
 
+    public void DeleteCustomer(Customer customer)
+    {
+        _ctx.Customers.Remove(customer);
+    }
+
     public Task<Customer?> FindCustomer(Guid customerId, CancellationToken cancellationToken = default)
     {
         var customer = _ctx.Customers
