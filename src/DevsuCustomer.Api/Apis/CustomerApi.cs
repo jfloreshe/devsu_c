@@ -36,31 +36,20 @@ public static class CustomerApi
         return TypedResults.Created(location, result.Value);
     }
 
-    public static async Task<Results<Ok<GetCustomerResult>, NotFound<ProblemDetails>>> GetCustomer([FromRoute] Guid clienteId, ICustomerRepository customerRepository)
+    public static async Task<Results<Ok<GetCustomerResult>, NotFound<ProblemDetails>>> GetCustomer([FromRoute] Guid clienteId, IMediator mediator)
     {
-        var customer = await customerRepository.FindCustomer(clienteId);
-        if (customer is null)
+        var result = await mediator.Send(new GetCustomerRequest { CustomerId = clienteId });
+        if (result.IsFailure)
         {
             return TypedResults.NotFound(new ProblemDetails
             {
-                Title = "Buscar cliente",
-                Detail = "No se encontró al cliente",
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
                 Status = StatusCodes.Status404NotFound
             });
         }
-        
-        return TypedResults.Ok(new GetCustomerResult
-        {
-            ClienteId = customer.CustomerId,
-            Contrasena = customer.Password,
-            Identificacion = customer.PersonalIdentifier,
-            Nombre = customer.Name,
-            Genero = customer.Gender,
-            Edad = customer.Age,
-            Direccion = customer.Address,
-            Telefono = customer.Phone,
-            Estado = customer.State
-        });
+
+        return TypedResults.Ok(result.Value);
     }
 
 }
