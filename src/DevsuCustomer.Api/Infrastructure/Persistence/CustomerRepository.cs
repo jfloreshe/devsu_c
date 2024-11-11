@@ -26,6 +26,15 @@ public class CustomerRepository : ICustomerRepository
         return customer;
     }
 
+    public Task<Customer?> FindCustomer(string personalIdentifier, CancellationToken cancellationToken = default)
+    {
+        var customer = _ctx.Customers
+            .Where(c => c.PersonalIdentifier.Equals(personalIdentifier))
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return customer;
+    }
+
     public Task<int> SaveEntities(CancellationToken cancellationToken = default)
     {
         return _ctx.SaveChangesAsync(cancellationToken);

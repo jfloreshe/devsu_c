@@ -21,10 +21,24 @@ public static class CustomerApi
     }
     public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, ICustomerRepository customerRepository)
     {
-        var newCustomer = new Customer(request.Identificacion, request.Nombre, request.Genero, request.Edad,
-            request.Direccion, request.Telefono, request.Contrasena, true);
-        newCustomer.CustomerId = Guid.NewGuid();
+        var customer = await customerRepository.FindCustomer(request.Identificacion);
         
+        if (customer is not null)
+        {
+            return TypedResults.Conflict(new ProblemDetails
+            {
+                Title = "Crear cliente",
+                Detail = "Ya existe un cliente con la identificación proporcionada",
+                Status = StatusCodes.Status409Conflict
+            });
+        }
+        
+        var newCustomer = new Customer(request.Identificacion, request.Nombre, request.Genero, request.Edad,
+            request.Direccion, request.Telefono, request.Contrasena, true)
+        {
+            CustomerId = Guid.NewGuid()
+        };
+
         customerRepository.AddCustomer(newCustomer);
         await customerRepository.SaveEntities();
         
