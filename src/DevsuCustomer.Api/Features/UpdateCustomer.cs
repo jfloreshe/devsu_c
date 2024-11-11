@@ -16,20 +16,21 @@ public static class UpdateCustomerErrors
 
 public class UpdateCustomerResult
 {
-    public Guid? ClienteId { get; set; }
+    public Guid? CustomerId { get; set; }
 }
 
 public class UpdateCustomerRequest : IRequest<Result<UpdateCustomerResult>>
 {
-    public Guid ClienteId { get; set; }
-    public string Contrasena { get; set; }
-    public string Identificacion { get; set; }
-    public string Nombre { get; set; }
-    public string Genero { get; set; }
-    public int Edad { get; set; }
-    public string Direccion { get; set; }
-    public string Telefono { get; set; }
-    public bool Estado { get; set; }
+    
+    public required Guid ClienteId { get; set; }
+    public required string Contrasena { get; set; }
+    public required string Identificacion { get; set; }
+    public required string Nombre { get; set; }
+    public required string Genero { get; set; }
+    public required int Edad { get; set; }
+    public required string Direccion { get; set; }
+    public required string Telefono { get; set; }
+    public required bool Estado { get; set; }
 }
 
 public class UpdateCustomerRequestHandler : IRequestHandler<UpdateCustomerRequest, Result<UpdateCustomerResult>>
@@ -63,7 +64,7 @@ public class UpdateCustomerRequestHandler : IRequestHandler<UpdateCustomerReques
 
         return Result<UpdateCustomerResult>.Success(new UpdateCustomerResult
         {
-            ClienteId = customer.CustomerId
+            CustomerId = customer.CustomerId
         });
     }
 }

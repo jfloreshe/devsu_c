@@ -19,13 +19,14 @@ public class CreateCustomerResult
 }
 public class CreateCustomerRequest : IRequest<Result<CreateCustomerResult>>
 {
-    public string Contrasena { get; set; }
-    public string Identificacion { get; set; }
-    public string Nombre { get; set; }
+    public required string Contrasena { get; set; }
+    public required string Identificacion { get; set; }
+    public required string Nombre { get; set; }
     public string Genero { get; set; }
     public int Edad { get; set; }
-    public string Direccion { get; set; }
-    public string Telefono { get; set; }
+    public required string Direccion { get; set; }
+    public required string Telefono { get; set; }
+    public required bool Estado { get; set; }
 }
 
 public class CreateCustomerRequestHandler : IRequestHandler<CreateCustomerRequest, Result<CreateCustomerResult>>
@@ -54,7 +55,7 @@ public class CreateCustomerRequestHandler : IRequestHandler<CreateCustomerReques
             address: request.Direccion,
             phone: request.Telefono,
             password: request.Contrasena,
-            state: true);
+            state: request.Estado);
 
         _customerRepository.AddCustomer(newCustomer);
 
