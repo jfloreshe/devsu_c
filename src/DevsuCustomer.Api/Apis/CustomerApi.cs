@@ -1,5 +1,6 @@
 ﻿using DevsuCustomer.Api.Features;
 using DevsuCustomer.Api.Models;
+using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,35 +20,20 @@ public static class CustomerApi
         api.MapPost("/", CreateCustomer);
         api.MapGet("/{clienteId:guid}", GetCustomer);
     }
-    public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, ICustomerRepository customerRepository)
+    public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, IMediator mediator)
     {
-        var customer = await customerRepository.FindCustomer(request.Identificacion);
-        
-        if (customer is not null)
+        var result = await mediator.Send(request);
+        if (result.IsFailure)
         {
             return TypedResults.Conflict(new ProblemDetails
             {
-                Title = "Crear cliente",
-                Detail = "Ya existe un cliente con la identificación proporcionada",
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
                 Status = StatusCodes.Status409Conflict
             });
         }
-        
-        var newCustomer = new Customer(request.Identificacion, request.Nombre, request.Genero, request.Edad,
-            request.Direccion, request.Telefono, request.Contrasena, true)
-        {
-            CustomerId = Guid.NewGuid()
-        };
-
-        customerRepository.AddCustomer(newCustomer);
-        await customerRepository.SaveEntities();
-        
-        var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.GroupName}/{newCustomer.CustomerId}";
-        return TypedResults.Created(location, new CreateCustomerResult
-        {
-            ClienteId = newCustomer.CustomerId,
-            Nombre = newCustomer.Name
-        });
+        var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.GroupName}/{result.Value.ClienteId}";
+        return TypedResults.Created(location, result.Value);
     }
 
     public static async Task<Results<Ok<GetCustomerResult>, NotFound<ProblemDetails>>> GetCustomer([FromRoute] Guid clienteId, ICustomerRepository customerRepository)
