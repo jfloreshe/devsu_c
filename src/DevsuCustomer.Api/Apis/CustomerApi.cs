@@ -36,10 +36,31 @@ public static class CustomerApi
         });
     }
 
-    public static async Task<Ok<Customer>> GetCustomer([FromRoute] Guid clienteId, ICustomerRepository customerRepository)
+    public static async Task<Results<Ok<GetCustomerResult>, NotFound<ProblemDetails>>> GetCustomer([FromRoute] Guid clienteId, ICustomerRepository customerRepository)
     {
         var customer = await customerRepository.FindCustomer(clienteId);
-        return TypedResults.Ok(customer);
+        if (customer is null)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = "Buscar cliente",
+                Detail = "No se encontró al cliente",
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        
+        return TypedResults.Ok(new GetCustomerResult
+        {
+            ClienteId = customer.CustomerId,
+            Contrasena = customer.Password,
+            Identificacion = customer.PersonalIdentifier,
+            Nombre = customer.Name,
+            Genero = customer.Gender,
+            Edad = customer.Age,
+            Direccion = customer.Address,
+            Telefono = customer.Phone,
+            Estado = customer.State
+        });
     }
 
 }
