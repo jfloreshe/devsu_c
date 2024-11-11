@@ -32,16 +32,16 @@ public class GetCustomerRequest : IRequest<Result<GetCustomerResult>>
 
 public class GetCustomerRequestHandler : IRequestHandler<GetCustomerRequest, Result<GetCustomerResult>>
 {
-    public readonly ICustomerRepository _CustomerRepository;
+    private readonly ICustomerRepository _customerRepository;
 
     public GetCustomerRequestHandler(ICustomerRepository customerRepository)
     {
-        _CustomerRepository = customerRepository;
+        _customerRepository = customerRepository;
     }
 
     public async Task<Result<GetCustomerResult>> Handle(GetCustomerRequest request, CancellationToken cancellationToken)
     {
-        var customer = await _CustomerRepository.FindCustomer(request.CustomerId, cancellationToken);
+        var customer = await _customerRepository.FindCustomer(request.CustomerId, cancellationToken);
 
         if (customer is null)
         {

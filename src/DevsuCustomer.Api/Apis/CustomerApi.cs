@@ -19,6 +19,7 @@ public static class CustomerApi
 
         api.MapPost("/", CreateCustomer);
         api.MapGet("/{clienteId:guid}", GetCustomer);
+        api.MapPut("/", UpdateCustomer);
     }
     public static async Task<Results<Created<CreateCustomerResult>,Conflict<ProblemDetails>>> CreateCustomer([FromBody] CreateCustomerRequest request, HttpContext ctx, IMediator mediator)
     {
@@ -52,4 +53,19 @@ public static class CustomerApi
         return TypedResults.Ok(result.Value);
     }
 
+    public static async Task<Results<NoContent, NotFound<ProblemDetails>>> UpdateCustomer([FromBody] UpdateCustomerRequest request, IMediator mediator)
+    {
+        var result = await mediator.Send(request);
+        if (result.IsFailure)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        return TypedResults.NoContent();
+    }
 }
