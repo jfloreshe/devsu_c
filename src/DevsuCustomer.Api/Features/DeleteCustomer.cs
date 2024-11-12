@@ -37,7 +37,6 @@ public class DeleteCustomerRequestHander : IRequestHandler<DeleteCustomerRequest
             return Result<DeleteCustomerResult>.Failure(DeleteCustomerErrors.CustomerNotFound);
         }
         
-        customer.State = false;
         _customerRepository.DeleteCustomer(customer);
         await _customerRepository.SaveEntities(cancellationToken);
 
