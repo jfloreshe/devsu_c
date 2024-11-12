@@ -11,10 +11,16 @@ public static class AccountApi
 {
     public static class Routes
     {
+        public const string AccountReportsGroupName = "api/reportes";
         public const string AccountGroupName = "api/cuentas";
         public const string AccountTransactionGroupName = "api/movimientos";
     }
 
+    public static void MapAccountReports(this IEndpointRouteBuilder app)
+    {
+        var api = app.MapGroup(Routes.AccountReportsGroupName);
+        api.MapGet("/", GetReportAccountState);
+    }
     public static void MapAccountApi(this IEndpointRouteBuilder app)
     {
         var api = app.MapGroup(Routes.AccountGroupName);
