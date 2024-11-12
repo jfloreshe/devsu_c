@@ -39,7 +39,7 @@ public static class AccountTransactionTypeFactory
         {
             AccountTransactionConstants.Withdraw => Result<IAccountTransactionType>.Success(WithdrawTransaction.Create),
             AccountTransactionConstants.Deposit => Result<IAccountTransactionType>.Success(DepositTransaction.Create),
-            _ => Result<IAccountTransactionType>.Failure(AccountTransactionUnprocessableErrors.AccountTransactionTypeNoValid)
+            _ => Result<IAccountTransactionType>.Failure(AccountTransactionDomainErrors.AccountTransactionTypeNoValid)
         };
     }
 }

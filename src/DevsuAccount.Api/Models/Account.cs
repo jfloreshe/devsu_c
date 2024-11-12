@@ -36,11 +36,14 @@ public class Account : IAggregateRoot
                 .First()
                 .Balance;
 
-        var newTransaction = new AccountTransaction(Guid.NewGuid(), DateTime.Now, transactionType, transactionValue, previousBalance, AccountId);
-        //We need to find possible errors with the newTransaction, so it should be a result
+        var newTransaction = AccountTransaction.Create(Guid.NewGuid(), DateTime.Now, transactionType, transactionValue, previousBalance, AccountId);
+        if (newTransaction.IsFailure)
+        {
+            return Result<AccountTransaction>.Failure(newTransaction.Error);
+        }
         
-        Transactions.Add(newTransaction);
+        Transactions.Add(newTransaction.Value);
         
-        return Result<AccountTransaction>.Success(newTransaction);
+        return Result<AccountTransaction>.Success(newTransaction.Value);
     }
 }
