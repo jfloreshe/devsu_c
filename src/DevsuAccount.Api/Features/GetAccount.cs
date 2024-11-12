@@ -48,7 +48,7 @@ public class GetAccountRequestHandler : IRequestHandler<GetAccountRequest ,Resul
         return Result<GetAccountResult>.Success(new GetAccountResult
         {
             NumeroCuenta = account.AccountNumber,
-            Tipo = account.Type,
+            Tipo = account.AccountType,
             SaldoInicial = account.OpeningBalance,
             Estado = account.State,
             Cliente = customer?.Name ?? string.Empty

@@ -6,7 +6,7 @@ public class Account : IAggregateRoot
 {
     public long AccountId { get; set; }
     public string AccountNumber { get; set; }
-    public string Type { get; set; }
+    public string AccountType { get; set; }
     public decimal OpeningBalance { get; set; }
     public bool State { get; set; }
     public Guid CustomerId { get; set; }
@@ -17,10 +17,10 @@ public class Account : IAggregateRoot
         Transactions = new List<AccountTransaction>();
     }
 
-    public Account(string accountNumber, string type, decimal openingBalance, bool state, Guid customerId)
+    public Account(string accountNumber, string accountType, decimal openingBalance, bool state, Guid customerId)
     {
         AccountNumber = accountNumber;
-        Type = type;
+        AccountType = accountType;
         OpeningBalance = openingBalance;
         State = state;
         CustomerId = customerId;

@@ -11,7 +11,11 @@ public static class Extensions
     public static void AddApplicationServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(Program)));
-        builder.Services.AddDbContext<AccountDbContext>(o => o.UseInMemoryDatabase("DevsuAccounts"));
+        builder.Services.AddDbContext<AccountDbContext>(o =>
+        {
+            o.EnableSensitiveDataLogging();
+            o.UseInMemoryDatabase("DevsuAccounts");
+        });
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
     }
 

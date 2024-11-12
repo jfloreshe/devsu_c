@@ -19,11 +19,11 @@ public class UpdateAccountResult
 }
 public class UpdateAccountRequest : IRequest<Result<UpdateAccountResult>>
 {
-    public string NumeroCuenta { get; set; }
-    public string Tipo { get; set; }
-    public decimal SaldoInicial { get; set; }
-    public bool Estado { get; set; }
-    public Guid ClienteId { get; set; }
+    public required string NumeroCuenta { get; set; }
+    public required string Tipo { get; set; }
+    public required decimal SaldoInicial { get; set; }
+    public required bool Estado { get; set; }
+    public required Guid ClienteId { get; set; }
 }
 
 public class UpdateAccountRequestHandler : IRequestHandler<UpdateAccountRequest ,Result<UpdateAccountResult>>
@@ -43,7 +43,7 @@ public class UpdateAccountRequestHandler : IRequestHandler<UpdateAccountRequest 
             return Result<UpdateAccountResult>.Failure(UpdateAccountErrors.AccountNotFound);
         }
 
-        account.Type = request.Tipo;
+        account.AccountType = request.Tipo;
         account.OpeningBalance = request.SaldoInicial;
         account.CustomerId = request.ClienteId;
         account.State = request.Estado;

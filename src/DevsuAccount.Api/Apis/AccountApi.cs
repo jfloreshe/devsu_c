@@ -19,6 +19,7 @@ public static class AccountApi
         api.MapPost("/", CreateAccount);
         api.MapGet("/{numeroCuenta}", GetAccount);
         api.MapPut("/", UpdateAccount);
+        api.MapPatch("/", PatchAccount);
     }
     
     public static void MapAccountTransactionApi(this IEndpointRouteBuilder app)
@@ -29,7 +30,7 @@ public static class AccountApi
     public static async Task<Results<
         Created<CreateAccountResult>,
         Conflict<ProblemDetails>>>
-        CreateAccount([FromBody] CreateAccountRequest request, IMediator mediator, HttpContext ctx)
+    CreateAccount([FromBody] CreateAccountRequest request, IMediator mediator, HttpContext ctx)
     {
         var response = await mediator.Send(request);
         if (response.IsFailure)
@@ -48,7 +49,7 @@ public static class AccountApi
     public static async Task<Results<
         Ok<GetAccountResult>,
         NotFound<ProblemDetails>>>
-        GetAccount([FromRoute] string numeroCuenta, IMediator mediator)
+    GetAccount([FromRoute] string numeroCuenta, IMediator mediator)
     {
         var response = await mediator.Send(new GetAccountRequest{AccountNumber = numeroCuenta});
         if (response.IsFailure)
@@ -66,7 +67,26 @@ public static class AccountApi
     public static async Task<Results<
         NoContent,
         NotFound<ProblemDetails>>>
-        UpdateAccount([FromBody] UpdateAccountRequest request, IMediator mediator)
+    UpdateAccount([FromBody] UpdateAccountRequest request, IMediator mediator)
+    {
+        var response = await mediator.Send(request);
+        if (response.IsFailure)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = response.Error.Title,
+                Detail = response.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        
+        return TypedResults.NoContent();
+    }
+    
+    public static async Task<Results<
+        NoContent,
+        NotFound<ProblemDetails>>>
+    PatchAccount([FromBody] PatchAccountRequest request, IMediator mediator)
     {
         var response = await mediator.Send(request);
         if (response.IsFailure)

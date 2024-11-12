@@ -19,11 +19,11 @@ public class CreateAccountResult
 }
 public class CreateAccountRequest : IRequest<Result<CreateAccountResult>>
 {
-    public string NumeroCuenta { get; set; }
-    public string Tipo { get; set; }
-    public decimal SaldoInicial { get; set; }
-    public bool Estado { get; set; }
-    public Guid ClienteId { get; set; }
+    public required string NumeroCuenta { get; set; }
+    public required string Tipo { get; set; }
+    public required decimal SaldoInicial { get; set; }
+    public required bool Estado { get; set; }
+    public required Guid ClienteId { get; set; }
 }
 
 public class CreateAccountRequestHandler : IRequestHandler<CreateAccountRequest ,Result<CreateAccountResult>>
@@ -46,7 +46,7 @@ public class CreateAccountRequestHandler : IRequestHandler<CreateAccountRequest 
         
         var newAccount = new Account(
             accountNumber: request.NumeroCuenta,
-            type: request.Tipo,
+            accountType: request.Tipo,
             openingBalance: request.SaldoInicial,
             state: request.Estado,
             customerId: request.ClienteId
