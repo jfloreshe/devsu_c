@@ -17,6 +17,7 @@ public static class AccountApi
     {
         var api = app.MapGroup(Routes.AccountGroupName);
         api.MapPost("/", CreateAccount);
+        api.MapGet("/{numeroCuenta}", GetAccount);
     }
     
     public static void MapAccountTransactionApi(this IEndpointRouteBuilder app)
@@ -24,7 +25,10 @@ public static class AccountApi
         var api = app.MapGroup(Routes.AccountTransactionGroupName);
     }
     
-    public static async Task<Results<Created<CreateAccountResult>, Conflict<ProblemDetails>>> CreateAccount([FromBody] CreateAccountRequest request, IMediator mediator, HttpContext ctx)
+    public static async Task<Results<
+        Created<CreateAccountResult>,
+        Conflict<ProblemDetails>>>
+        CreateAccount([FromBody] CreateAccountRequest request, IMediator mediator, HttpContext ctx)
     {
         var response = await mediator.Send(request);
         if (response.IsFailure)
@@ -38,5 +42,23 @@ public static class AccountApi
         }
         var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.AccountGroupName}/{response.Value.NumeroCuenta}";
         return TypedResults.Created(location, response.Value);
+    }
+    
+    public static async Task<Results<
+        Ok<GetAccountResult>,
+        NotFound<ProblemDetails>>>
+        GetAccount([FromRoute] string numeroCuenta, IMediator mediator)
+    {
+        var response = await mediator.Send(new GetAccountRequest{AccountNumber = numeroCuenta});
+        if (response.IsFailure)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = response.Error.Title,
+                Detail = response.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        return TypedResults.Ok(response.Value);
     }
 }

@@ -27,7 +27,16 @@ public class AccountRepository : IAccountRepository
     {
         _ctx.Accounts.Add(newAccount);
     }
-    
+
+    public Task<Customer?> FindCustomerAsync(Guid accountCustomerId, CancellationToken cancellationToken = default)
+    {
+        var customer = _ctx.Customers
+            .Where(c => c.CustomerId.Equals(accountCustomerId))
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return customer;
+    }
+
     public Task<int> SaveEntities(CancellationToken cancellationToken = default)
     {
         return _ctx.SaveChangesAsync(cancellationToken);
