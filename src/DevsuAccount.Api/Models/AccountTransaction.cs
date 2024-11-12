@@ -1,7 +1,10 @@
-﻿namespace DevsuAccount.Api.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DevsuAccount.Api.Models;
 
 public class AccountTransaction
 {
+    [Key]
     public Guid TransactionId { get; set; }
     public DateTime DateCreation { get; set; }
     public string Type { get; set; }

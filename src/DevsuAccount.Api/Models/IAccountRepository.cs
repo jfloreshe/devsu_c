@@ -2,7 +2,8 @@
 
 namespace DevsuAccount.Api.Models;
 
-public class IAccountRepository : IRepository<Account>
-{
-    
+public interface IAccountRepository : IRepository<Account>
+{ 
+    Task<Account?> FindAccountAsync(string accountNumber, CancellationToken cancellationToken = default);
+    void AddAccount(Account newAccount);
 }
