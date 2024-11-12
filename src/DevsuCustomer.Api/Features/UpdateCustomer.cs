@@ -1,6 +1,6 @@
-﻿using DevsuCustomer.Api.Infrastructure.Persistence;
+﻿using Devsu.Shared.Primitives;
+using DevsuCustomer.Api.Infrastructure.Persistence;
 using DevsuCustomer.Api.Models;
-using DevsuCustomer.Api.Models.Primitives;
 using MediatR;
 
 namespace DevsuCustomer.Api.Features;

@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevsuCustomer.Api", "src\De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevsuCustomer.Tests", "tests\DevsuCustomer.Tests\DevsuCustomer.Tests.csproj", "{B24CDB16-A534-4EF5-A0C2-2CA6F0F63520}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevsuAccount.Api", "src\DevsuAccount.Api\DevsuAccount.Api.csproj", "{4FEB1DA8-3B93-4C97-A197-4092B75A0EAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Devsu.Shared", "src\Devsu.Shared\Devsu.Shared.csproj", "{8ED9FE12-5926-4795-84C5-257D3F9255E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{B24CDB16-A534-4EF5-A0C2-2CA6F0F63520}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B24CDB16-A534-4EF5-A0C2-2CA6F0F63520}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B24CDB16-A534-4EF5-A0C2-2CA6F0F63520}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FEB1DA8-3B93-4C97-A197-4092B75A0EAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FEB1DA8-3B93-4C97-A197-4092B75A0EAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FEB1DA8-3B93-4C97-A197-4092B75A0EAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FEB1DA8-3B93-4C97-A197-4092B75A0EAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ED9FE12-5926-4795-84C5-257D3F9255E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ED9FE12-5926-4795-84C5-257D3F9255E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ED9FE12-5926-4795-84C5-257D3F9255E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ED9FE12-5926-4795-84C5-257D3F9255E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

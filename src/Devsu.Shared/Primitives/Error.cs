@@ -1,4 +1,4 @@
-﻿namespace DevsuCustomer.Api.Models.Primitives;
+﻿namespace Devsu.Shared.Primitives;
 
 public sealed record Error(string Title, string? Description = null, int? Code = null)
 {

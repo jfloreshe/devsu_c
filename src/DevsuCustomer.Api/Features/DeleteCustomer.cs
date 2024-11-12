@@ -1,5 +1,5 @@
-﻿using DevsuCustomer.Api.Models;
-using DevsuCustomer.Api.Models.Primitives;
+﻿using Devsu.Shared.Primitives;
+using DevsuCustomer.Api.Models;
 using MediatR;
 
 namespace DevsuCustomer.Api.Features;

@@ -1,4 +1,4 @@
-﻿namespace DevsuCustomer.Api.Models.Primitives;
+﻿namespace Devsu.Shared.Primitives;
 
 public class Result<T>
 {

@@ -1,4 +1,4 @@
-﻿using DevsuCustomer.Api.Models.Primitives;
+﻿using Devsu.Shared.Primitives;
 
 namespace DevsuCustomer.Api.Models;
 
