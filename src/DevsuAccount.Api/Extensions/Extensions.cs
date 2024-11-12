@@ -1,5 +1,7 @@
-﻿using DevsuAccount.Api.Infrastructure.Persistence;
+﻿using DevsuAccount.Api.Infrastructure.Integration;
+using DevsuAccount.Api.Infrastructure.Persistence;
 using DevsuAccount.Api.Models;
+using MassTransit;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +20,14 @@ public static class Extensions
         // });
         builder.Services.AddDbContext<AccountDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DevsuAccountDb")));
+        builder.Services.AddMassTransit(iBusConfig =>
+        {
+            iBusConfig.SetKebabCaseEndpointNameFormatter();
+            iBusConfig.AddConsumer<CurrentTimeConsumer>();
+            iBusConfig.UsingInMemory((iBusContext, configInMemory) => configInMemory.ConfigureEndpoints(iBusContext));
+        });
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+        builder.Services.AddHostedService<MessagePublisher>();
     }
 
     public static void AddApiMiddlewareException(this IApplicationBuilder app)
