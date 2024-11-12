@@ -18,5 +18,6 @@ public class AccountDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AccountEntityConfiguration());
         modelBuilder.ApplyConfiguration(new AccountTransactionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new CustomerEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountTransactionLogEntityConfiguration());
     }
 }
