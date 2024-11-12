@@ -40,6 +40,26 @@ public class UpdateAccountTransactionRequestHandler : IRequestHandler<UpdateAcco
             return Result<UpdateAccountTransactionResult>.Failure(UpdateAccountTransactionErrors.AccountTransactionNotFound);
         }
         
+        var transaction = account.Transactions
+            .First(t => t.TransactionId == request.MovimientoId);
+        
+        var accTransactionTypeResult = AccountTransactionTypeFactory.Create(request.Tipo);
+        if (accTransactionTypeResult.IsFailure)
+        {
+            return Result<UpdateAccountTransactionResult>.Failure(accTransactionTypeResult.Error);
+        }
+
+        var endRequest = transaction.Type == accTransactionTypeResult.Value;
+        
+
+        if (transaction.TransactionValue == request.Movimiento && endRequest)
+        {
+            return Result<UpdateAccountTransactionResult>.Success(new UpdateAccountTransactionResult
+            {
+                MovimientoId = transaction.TransactionId
+            });
+        } 
+        
         var transactionUpdatedResult = account.UpdateTransaction(request.MovimientoId, request.Tipo, request.Movimiento);
         if (transactionUpdatedResult.IsFailure)
         {

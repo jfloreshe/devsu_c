@@ -31,6 +31,7 @@ public static class AccountApi
         api.MapPost("/", CreateAccountTransaction);
         api.MapGet("/{movimientoId:guid}", GetAccountTransaction);
         api.MapPut("/", UpdateAccountTransaction);
+        api.MapPatch("/", PatchAccountTransaction);
     }
     
     public static async Task<Results<
@@ -193,9 +194,9 @@ public static class AccountApi
     }
     
     public static async Task<Results<
-            Ok<GetAccountTransactionResult>,
-            NotFound<ProblemDetails>>>
-        GetAccountTransaction([FromRoute] Guid movimientoId, IMediator mediator)
+        Ok<GetAccountTransactionResult>,
+        NotFound<ProblemDetails>>> 
+    GetAccountTransaction([FromRoute] Guid movimientoId, IMediator mediator)
     {
         var response = await mediator.Send(new GetAccountTransactionRequest{AccountTransactionId = movimientoId});
         if (response.IsFailure)
@@ -211,11 +212,53 @@ public static class AccountApi
     }
     
     public static async Task<Results<
-            NoContent,
-            UnprocessableEntity<ProblemDetails>,
-            Conflict<ProblemDetails>,
-            NotFound<ProblemDetails>>>
-        UpdateAccountTransaction([FromBody] UpdateAccountTransactionRequest request, IMediator mediator)
+        NoContent,
+        UnprocessableEntity<ProblemDetails>,
+        Conflict<ProblemDetails>,
+        NotFound<ProblemDetails>>>
+    UpdateAccountTransaction([FromBody] UpdateAccountTransactionRequest request, IMediator mediator)
+    {
+        //This update will modify also all the movements created after the main movement
+        var result = await mediator.Send(request);
+        if (result.IsFailure)
+        {
+            if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)
+            {
+                return TypedResults.UnprocessableEntity(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            
+            if (result.Error.Code == StatusCodes.Status409Conflict)
+            {
+                return TypedResults.Conflict(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status409Conflict
+                });
+            }
+            
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        
+        return TypedResults.NoContent();
+    }
+    
+    public static async Task<Results<
+        NoContent,
+        UnprocessableEntity<ProblemDetails>,
+        Conflict<ProblemDetails>,
+        NotFound<ProblemDetails>>>
+    PatchAccountTransaction([FromBody] PatchAccountTransactionRequest request, IMediator mediator)
     {
         //This update will modify also all the movements created after the main movement
         var result = await mediator.Send(request);
