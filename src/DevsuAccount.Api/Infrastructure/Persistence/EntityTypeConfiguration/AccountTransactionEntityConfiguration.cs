@@ -16,6 +16,7 @@ public class AccountTransactionEntityConfiguration : IEntityTypeConfiguration<Ac
         transactionConfiguration.Property(t => t.TransactionValue);
         transactionConfiguration.Property(t => t.Balance);
         
+        
         transactionConfiguration.HasMany(t => t.Logs)
             .WithOne(tl => tl.Transaction)
             .HasForeignKey(t => t.TransactionId)

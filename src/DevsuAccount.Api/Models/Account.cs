@@ -1,4 +1,5 @@
-﻿using Devsu.Shared.Primitives;
+﻿using System.Transactions;
+using Devsu.Shared.Primitives;
 
 namespace DevsuAccount.Api.Models;
 
@@ -164,6 +165,36 @@ public class Account : IAggregateRoot
         }
 
         return Result<AccountTransaction>.Success(rootAccountTransaction);
+    }
+
+    public Result<AccountTransaction> DeleteTransaction(Guid accountTransactionId)
+    {
+        var tempTransactions = Transactions
+            .OrderBy(t => t.DateCreation)
+            .ToList();
+        
+        var (transactionToDelete, indexToDelete) = tempTransactions
+            .Select((transaction, index) => (transaction, index))
+            .First(tuple => tuple.transaction.TransactionId == accountTransactionId);
+
+        Transactions.Remove(transactionToDelete);
+
+        if (indexToDelete >= tempTransactions.Count - 1)
+            return Result<AccountTransaction>.Success(transactionToDelete);
+        
+        var transactionToRebalance = tempTransactions[indexToDelete + 1];
+        var transactionToRebalancePositiveBalance = transactionToRebalance.Type is WithdrawTransaction
+            ? transactionToRebalance.TransactionValue * -1
+            : transactionToRebalance.TransactionValue;
+
+        var transactionToRebalanceTransactionType = transactionToRebalance.Type.Value;
+
+        var updateResult = UpdateTransaction(transactionToRebalance.TransactionId, transactionToRebalanceTransactionType,
+            transactionToRebalancePositiveBalance);
+        
+        return updateResult.IsFailure 
+            ? Result<AccountTransaction>.Failure(updateResult.Error) 
+            : Result<AccountTransaction>.Success(transactionToDelete);
     }
 }
 

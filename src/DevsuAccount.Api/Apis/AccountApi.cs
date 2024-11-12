@@ -32,6 +32,7 @@ public static class AccountApi
         api.MapGet("/{movimientoId:guid}", GetAccountTransaction);
         api.MapPut("/", UpdateAccountTransaction);
         api.MapPatch("/", PatchAccountTransaction);
+        api.MapDelete("/{movimientoId:guid}", DeleteAccountTransaction);
     }
     
     public static async Task<Results<
@@ -262,6 +263,48 @@ public static class AccountApi
     {
         //This update will modify also all the movements created after the main movement
         var result = await mediator.Send(request);
+        if (result.IsFailure)
+        {
+            if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)
+            {
+                return TypedResults.UnprocessableEntity(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            
+            if (result.Error.Code == StatusCodes.Status409Conflict)
+            {
+                return TypedResults.Conflict(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status409Conflict
+                });
+            }
+            
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        
+        return TypedResults.NoContent();
+    }
+    
+    public static async Task<Results<
+        NoContent,
+        UnprocessableEntity<ProblemDetails>,
+        Conflict<ProblemDetails>,
+        NotFound<ProblemDetails>>>
+    DeleteAccountTransaction([FromRoute] Guid movimientoId, IMediator mediator)
+    {
+        //This update will modify also all the movements created after the main movement
+        var result = await mediator.Send(new DeleteAccountTransactionRequest { AccountTransactionId = movimientoId });
         if (result.IsFailure)
         {
             if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)

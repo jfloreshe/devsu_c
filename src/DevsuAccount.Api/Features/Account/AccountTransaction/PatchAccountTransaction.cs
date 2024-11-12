@@ -38,7 +38,7 @@ public class PatchAccountTransactionRequestHandler : IRequestHandler<PatchAccoun
         var account = await _accountRepository.FindAccount(request.MovimientoId, cancellationToken);
         if(account is null)
         {
-            return Result<PatchAccountTransactionResult>.Failure(UpdateAccountTransactionErrors.AccountTransactionNotFound);
+            return Result<PatchAccountTransactionResult>.Failure(PatchAccountTransactionErrors.AccountTransactionNotFound);
         }
 
         bool endRequest;

@@ -51,17 +51,6 @@ public class AccountRepository : IAccountRepository
     {
         _ctx.Transactions.Add(newTransaction);
     }
-
-    public Task<Account?> FindAccountTransaction(Guid accountTransactionId, CancellationToken cancellationToken = default)
-    {
-        var account = _ctx.Accounts
-            .AsSplitQuery()
-            .Include(a => a.Transactions
-                .Where(t => t.TransactionId == accountTransactionId))
-            .FirstOrDefaultAsync(cancellationToken);
-        
-        return account;
-    }
     
     public Task<Account?> FindAccount(Guid accountTransactionId, CancellationToken cancellationToken = default)
     {
@@ -72,6 +61,13 @@ public class AccountRepository : IAccountRepository
             .FirstOrDefaultAsync(cancellationToken);
         
         return account;
+    }
+
+    public void DeleteAccountTransaction(AccountTransaction accountTransaction)
+    {
+        _ctx.Transactions.Remove(accountTransaction);
+        var a = _ctx.Entry(accountTransaction).Entity;
+        var b = 1;
     }
 
     public Task<int> SaveEntities(CancellationToken cancellationToken = default)

@@ -40,7 +40,7 @@ public class GetAccountTransactionRequestHandler : IRequestHandler<GetAccountTra
 
     public async Task<Result<GetAccountTransactionResult>> Handle(GetAccountTransactionRequest transactionRequest, CancellationToken cancellationToken = default)
     {
-        var account = await _accountRepository.FindAccountTransaction(transactionRequest.AccountTransactionId, cancellationToken);
+        var account = await _accountRepository.FindAccount(transactionRequest.AccountTransactionId, cancellationToken);
         
         if (account is null)
         {

@@ -10,6 +10,6 @@ public interface IAccountRepository : IRepository<Account>
     void UpdateAccount(Account account);
     void DeleteAccount(Account customer);
     void AddTransaction(AccountTransaction newTransactionValue);
-    Task<Account?> FindAccountTransaction(Guid accountTransactionId, CancellationToken cancellationToken = default);
     Task<Account?> FindAccount(Guid accountTransactionId, CancellationToken cancellationToken = default);
+    void DeleteAccountTransaction(AccountTransaction accountTransaction);
 }
