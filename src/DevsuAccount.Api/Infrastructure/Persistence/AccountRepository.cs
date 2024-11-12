@@ -1,4 +1,5 @@
-﻿using DevsuAccount.Api.Models;
+﻿using DevsuAccount.Api.Features.Account;
+using DevsuAccount.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevsuAccount.Api.Infrastructure.Persistence;
@@ -66,6 +67,54 @@ public class AccountRepository : IAccountRepository
     public void DeleteAccountTransaction(AccountTransaction accountTransaction)
     {
         _ctx.Transactions.Remove(accountTransaction);
+    }
+
+    public async Task<GetAccountStateReportResult> GetAccountState(Guid requestCustomerId, DateTime initialDate,
+        DateTime finalDate, int page, int size,
+        CancellationToken cancellationToken = default)
+    {
+        var customer = await FindCustomer(requestCustomerId, cancellationToken);
+        
+        //TODO: improve with raw query and indexes
+        var totalTransactions = await _ctx.Transactions
+            .AsSplitQuery()
+            .Include(t => t.Account)
+            .Where(t => t.Account.CustomerId == requestCustomerId && t.DateCreation >= initialDate && t.DateCreation <= finalDate)
+            .OrderBy(t => t.DateCreation)
+            .Take(size)
+            .Skip(page*size)
+            .Select(t => t.TransactionId)
+            .CountAsync(cancellationToken);
+        
+        var transactions = await _ctx.Transactions
+            .AsSplitQuery()
+            .Include(t => t.Account)
+            .Where(t => t.Account.CustomerId == requestCustomerId && t.DateCreation >= initialDate && t.DateCreation <= finalDate)
+            .OrderBy(t => t.DateCreation)
+            .Take(size)
+            .Skip(page*size)
+            .Select(t => new GetAccountStateReportDetailsResult
+            {
+                Fecha = t.DateCreation,
+                NumeroCuenta = t.Account.AccountNumber,
+                Tipo = t.Account.AccountType.Value,
+                SaldoInicial = t.Account.OpeningBalance,
+                Estado = t.Account.State,
+                Movimiento = t.TransactionValue,
+                SaldoDisponible = t.Balance
+            })
+            .ToListAsync(cancellationToken);
+        
+        transactions.ForEach(t => t.Cliente = customer?.Name ?? string.Empty);
+
+        GetAccountStateReportResult result = new()
+        {
+            Data = transactions,
+            Pagina = page,
+            TamanoBatch = size,
+            NumeroTotalRegistros = totalTransactions
+        };
+        return result;
     }
 
     public Task<int> SaveEntities(CancellationToken cancellationToken = default)
