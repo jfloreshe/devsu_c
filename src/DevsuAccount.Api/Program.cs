@@ -11,6 +11,7 @@ var app = builder.Build();
 app.AddApiMiddlewareException();
 app.MapAccountApi();
 app.MapAccountTransactionApi();
+app.MapAccountReports();
 
 if (app.Environment.IsDevelopment())
 {

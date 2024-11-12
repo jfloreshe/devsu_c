@@ -343,4 +343,21 @@ public static class AccountApi
         
         return TypedResults.NoContent();
     }
+    
+    public static async Task<
+        Ok<GetAccountStateReportResult>>
+    GetReportAccountState([FromQuery] DateTime? fechaInicio, [FromQuery] DateTime? fechaFin, [FromQuery] Guid clienteId, [FromQuery] int? pagina, [FromQuery] int? tamanoPagina,IMediator mediator)
+    {
+        
+        var result = await mediator.Send(new GetAccountStateReportRequest
+        {
+            FechaInicio = fechaInicio,
+            FechaFin = fechaFin,
+            CustomerId =clienteId,
+            Page = pagina,
+            Size = tamanoPagina
+        });
+                
+        return TypedResults.Ok(result);
+    }
 }
