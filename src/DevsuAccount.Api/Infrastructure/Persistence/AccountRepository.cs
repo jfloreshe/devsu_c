@@ -42,6 +42,11 @@ public class AccountRepository : IAccountRepository
         _ctx.Accounts.Update(account);
     }
 
+    public void DeleteCustomer(Account customer)
+    {
+        _ctx.Accounts.Remove(customer);
+    }
+
     public Task<int> SaveEntities(CancellationToken cancellationToken = default)
     {
        return _ctx.SaveChangesAsync(cancellationToken);

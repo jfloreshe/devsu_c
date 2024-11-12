@@ -8,4 +8,5 @@ public interface IAccountRepository : IRepository<Account>
     void AddAccount(Account newAccount);
     Task<Customer?> FindCustomerAsync(Guid accountCustomerId, CancellationToken cancellationToken = default);
     void UpdateAccount(Account account);
+    void DeleteCustomer(Account customer);
 }

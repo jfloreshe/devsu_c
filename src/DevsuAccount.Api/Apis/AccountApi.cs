@@ -20,6 +20,7 @@ public static class AccountApi
         api.MapGet("/{numeroCuenta}", GetAccount);
         api.MapPut("/", UpdateAccount);
         api.MapPatch("/", PatchAccount);
+        api.MapDelete("/{numerCuenta}", DeleteAccount);
     }
     
     public static void MapAccountTransactionApi(this IEndpointRouteBuilder app)
@@ -89,6 +90,25 @@ public static class AccountApi
     PatchAccount([FromBody] PatchAccountRequest request, IMediator mediator)
     {
         var response = await mediator.Send(request);
+        if (response.IsFailure)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = response.Error.Title,
+                Detail = response.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        
+        return TypedResults.NoContent();
+    }
+    
+    public static async Task<Results<
+        NoContent,
+        NotFound<ProblemDetails>>>
+    DeleteAccount([FromRoute] string numerCuenta, IMediator mediator)
+    {
+        var response = await mediator.Send(new DeleteAccountRequest { AccountNumber = numerCuenta });
         if (response.IsFailure)
         {
             return TypedResults.NotFound(new ProblemDetails
