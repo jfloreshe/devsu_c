@@ -80,9 +80,6 @@ public class AccountRepository : IAccountRepository
             .AsSplitQuery()
             .Include(t => t.Account)
             .Where(t => t.Account.CustomerId == requestCustomerId && t.DateCreation >= initialDate && t.DateCreation <= finalDate)
-            .OrderBy(t => t.DateCreation)
-            .Take(size)
-            .Skip(page*size)
             .Select(t => t.TransactionId)
             .CountAsync(cancellationToken);
         
