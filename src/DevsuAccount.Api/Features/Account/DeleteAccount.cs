@@ -33,13 +33,13 @@ public class DeleteAccountRequestHandler : IRequestHandler<DeleteAccountRequest 
 
     public async Task<Result<DeleteAccountResult>> Handle(DeleteAccountRequest request, CancellationToken cancellationToken = default)
     {
-        var account = await _accountRepository.FindAccountAsync(request.AccountNumber, cancellationToken);
+        var account = await _accountRepository.FindAccount(request.AccountNumber, cancellationToken);
         if (account is null)
         {
             return Result<DeleteAccountResult>.Failure(DeleteAccountErrors.AccountNotFound);
         }
 
-        _accountRepository.DeleteCustomer(account);
+        _accountRepository.DeleteAccount(account);
         await _accountRepository.SaveEntities(cancellationToken);
         
         return Result<DeleteAccountResult>.Success(new DeleteAccountResult

@@ -37,7 +37,7 @@ public class CreateAccountRequestHandler : IRequestHandler<CreateAccountRequest 
 
     public async Task<Result<CreateAccountResult>> Handle(CreateAccountRequest request, CancellationToken cancellationToken = default)
     {
-        var account = await _accountRepository.FindAccountAsync(request.NumeroCuenta, cancellationToken);
+        var account = await _accountRepository.FindAccount(request.NumeroCuenta, cancellationToken);
         
         if (account is not null)
         {

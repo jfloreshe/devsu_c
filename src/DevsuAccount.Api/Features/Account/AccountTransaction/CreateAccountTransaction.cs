@@ -25,9 +25,9 @@ public class CreateAccountTransactionResult
 }
 public class CreateAccountTransactionRequest : IRequest<Result<CreateAccountTransactionResult>>
 {
-    public string NumeroCuenta { get; set; }
-    public string Tipo { get; set; }
-    public decimal Movimiento { get; set; }
+    public required string NumeroCuenta { get; set; }
+    public required string Tipo { get; set; }
+    public required decimal Movimiento { get; set; }
 }
 
 public class CreateAccountTransactionRequestHandler : IRequestHandler<CreateAccountTransactionRequest ,Result<CreateAccountTransactionResult>>
@@ -41,7 +41,7 @@ public class CreateAccountTransactionRequestHandler : IRequestHandler<CreateAcco
 
     public async Task<Result<CreateAccountTransactionResult>> Handle(CreateAccountTransactionRequest request, CancellationToken cancellationToken = default)
     {
-        var account = await _accountRepository.FindAccountAsync(request.NumeroCuenta, cancellationToken);
+        var account = await _accountRepository.FindAccount(request.NumeroCuenta, cancellationToken);
         switch (account)
         {
             case null:

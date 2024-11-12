@@ -37,7 +37,7 @@ public class UpdateAccountRequestHandler : IRequestHandler<UpdateAccountRequest 
 
     public async Task<Result<UpdateAccountResult>> Handle(UpdateAccountRequest request, CancellationToken cancellationToken = default)
     {
-        var account = await _accountRepository.FindAccountAsync(request.NumeroCuenta, cancellationToken);
+        var account = await _accountRepository.FindAccount(request.NumeroCuenta, cancellationToken);
         if (account is null)
         {
             return Result<UpdateAccountResult>.Failure(UpdateAccountErrors.AccountNotFound);

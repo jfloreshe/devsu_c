@@ -37,7 +37,7 @@ public class PatchAccountRequestHandler : IRequestHandler<PatchAccountRequest ,R
 
     public async Task<Result<PAtchAccountResult>> Handle(PatchAccountRequest request, CancellationToken cancellationToken = default)
     {
-        var account = await _accountRepository.FindAccountAsync(request.NumeroCuenta, cancellationToken);
+        var account = await _accountRepository.FindAccount(request.NumeroCuenta, cancellationToken);
         if (account is null)
         {
             return Result<PAtchAccountResult>.Failure(PatchAccountErrors.AccountNotFound);

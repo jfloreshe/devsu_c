@@ -37,13 +37,13 @@ public class GetAccountRequestHandler : IRequestHandler<GetAccountRequest ,Resul
 
     public async Task<Result<GetAccountResult>> Handle(GetAccountRequest request, CancellationToken cancellationToken = default)
     {
-        var account = await _accountRepository.FindAccountAsync(request.AccountNumber, cancellationToken);
+        var account = await _accountRepository.FindAccount(request.AccountNumber, cancellationToken);
         if (account is null)
         {
             return Result<GetAccountResult>.Failure(GetAccountErrors.AccountNotFound);
         }
 
-        var customer = await _accountRepository.FindCustomerAsync(account.CustomerId, cancellationToken);
+        var customer = await _accountRepository.FindCustomer(account.CustomerId, cancellationToken);
         
         
         return Result<GetAccountResult>.Success(new GetAccountResult

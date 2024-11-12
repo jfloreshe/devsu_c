@@ -4,10 +4,11 @@ namespace DevsuAccount.Api.Models;
 
 public interface IAccountRepository : IRepository<Account>
 { 
-    Task<Account?> FindAccountAsync(string accountNumber, CancellationToken cancellationToken = default);
+    Task<Account?> FindAccount(string accountNumber, CancellationToken cancellationToken = default);
     void AddAccount(Account newAccount);
-    Task<Customer?> FindCustomerAsync(Guid accountCustomerId, CancellationToken cancellationToken = default);
+    Task<Customer?> FindCustomer(Guid accountCustomerId, CancellationToken cancellationToken = default);
     void UpdateAccount(Account account);
-    void DeleteCustomer(Account customer);
+    void DeleteAccount(Account customer);
     void AddTransaction(AccountTransaction newTransactionValue);
+    Task<Account?> FindAccountTransaction(Guid accountTransactionId, CancellationToken cancellationToken = default);
 }

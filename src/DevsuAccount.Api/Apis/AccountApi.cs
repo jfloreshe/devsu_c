@@ -29,6 +29,7 @@ public static class AccountApi
     {
         var api = app.MapGroup(Routes.AccountTransactionGroupName);
         api.MapPost("/", CreateAccountTransaction);
+        api.MapGet("/{movimientoId:guid}", GetAccountTransaction);
     }
     
     public static async Task<Results<
@@ -188,5 +189,23 @@ public static class AccountApi
         }
         var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.AccountGroupName}/{result.Value.MovimientoId}";
         return TypedResults.Created(location, result.Value);
+    }
+    
+    public static async Task<Results<
+            Ok<GetAccountTransactionResult>,
+            NotFound<ProblemDetails>>>
+        GetAccountTransaction([FromRoute] Guid movimientoId, IMediator mediator)
+    {
+        var response = await mediator.Send(new GetAccountTransactionRequest{AccountTransactionId = movimientoId});
+        if (response.IsFailure)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = response.Error.Title,
+                Detail = response.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        return TypedResults.Ok(response.Value);
     }
 }
