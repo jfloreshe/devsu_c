@@ -18,6 +18,7 @@ public static class AccountApi
         var api = app.MapGroup(Routes.AccountGroupName);
         api.MapPost("/", CreateAccount);
         api.MapGet("/{numeroCuenta}", GetAccount);
+        api.MapPut("/", UpdateAccount);
     }
     
     public static void MapAccountTransactionApi(this IEndpointRouteBuilder app)
@@ -60,5 +61,24 @@ public static class AccountApi
             });
         }
         return TypedResults.Ok(response.Value);
+    }
+    
+    public static async Task<Results<
+        NoContent,
+        NotFound<ProblemDetails>>>
+        UpdateAccount([FromBody] UpdateAccountRequest request, IMediator mediator)
+    {
+        var response = await mediator.Send(request);
+        if (response.IsFailure)
+        {
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = response.Error.Title,
+                Detail = response.Error.Description,
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+        
+        return TypedResults.NoContent();
     }
 }

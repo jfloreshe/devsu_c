@@ -37,6 +37,11 @@ public class AccountRepository : IAccountRepository
         return customer;
     }
 
+    public void UpdateAccount(Account account)
+    {
+        _ctx.Accounts.Update(account);
+    }
+
     public Task<int> SaveEntities(CancellationToken cancellationToken = default)
     {
         return _ctx.SaveChangesAsync(cancellationToken);
