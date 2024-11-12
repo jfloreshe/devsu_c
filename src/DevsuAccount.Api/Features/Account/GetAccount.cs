@@ -45,10 +45,11 @@ public class GetAccountRequestHandler : IRequestHandler<GetAccountRequest ,Resul
 
         var customer = await _accountRepository.FindCustomerAsync(account.CustomerId, cancellationToken);
         
+        
         return Result<GetAccountResult>.Success(new GetAccountResult
         {
             NumeroCuenta = account.AccountNumber,
-            Tipo = account.AccountType,
+            Tipo = account.AccountType.Value,
             SaldoInicial = account.OpeningBalance,
             Estado = account.State,
             Cliente = customer?.Name ?? string.Empty

@@ -33,21 +33,32 @@ public static class AccountApi
     
     public static async Task<Results<
         Created<CreateAccountResult>,
+        UnprocessableEntity<ProblemDetails>,
         Conflict<ProblemDetails>>>
     CreateAccount([FromBody] CreateAccountRequest request, IMediator mediator, HttpContext ctx)
     {
-        var response = await mediator.Send(request);
-        if (response.IsFailure)
+        var result = await mediator.Send(request);
+        if (result.IsFailure)
         {
+            if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)
+            {
+                return TypedResults.UnprocessableEntity(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            
             return TypedResults.Conflict(new ProblemDetails
             {
-                Title = response.Error.Title,
-                Detail = response.Error.Description,
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
                 Status = StatusCodes.Status409Conflict
             });
         }
-        var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.AccountGroupName}/{response.Value.NumeroCuenta}";
-        return TypedResults.Created(location, response.Value);
+        var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.AccountGroupName}/{result.Value.NumeroCuenta}";
+        return TypedResults.Created(location, result.Value);
     }
     
     public static async Task<Results<
@@ -70,16 +81,27 @@ public static class AccountApi
     
     public static async Task<Results<
         NoContent,
+        UnprocessableEntity<ProblemDetails>,
         NotFound<ProblemDetails>>>
     UpdateAccount([FromBody] UpdateAccountRequest request, IMediator mediator)
     {
-        var response = await mediator.Send(request);
-        if (response.IsFailure)
+        var result = await mediator.Send(request);
+        if (result.IsFailure)
         {
+            if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)
+            {
+                return TypedResults.UnprocessableEntity(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            
             return TypedResults.NotFound(new ProblemDetails
             {
-                Title = response.Error.Title,
-                Detail = response.Error.Description,
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
                 Status = StatusCodes.Status404NotFound
             });
         }
@@ -89,16 +111,27 @@ public static class AccountApi
     
     public static async Task<Results<
         NoContent,
+        UnprocessableEntity<ProblemDetails>,
         NotFound<ProblemDetails>>>
     PatchAccount([FromBody] PatchAccountRequest request, IMediator mediator)
     {
-        var response = await mediator.Send(request);
-        if (response.IsFailure)
+        var result = await mediator.Send(request);
+        if (result.IsFailure)
         {
+            if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)
+            {
+                return TypedResults.UnprocessableEntity(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            
             return TypedResults.NotFound(new ProblemDetails
             {
-                Title = response.Error.Title,
-                Detail = response.Error.Description,
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
                 Status = StatusCodes.Status404NotFound
             });
         }
@@ -129,20 +162,31 @@ public static class AccountApi
     
     public static async Task<Results<
         Created<CreateAccountTransactionResult>,
+        UnprocessableEntity<ProblemDetails>,
         Conflict<ProblemDetails>>>
     CreateAccountTransaction([FromBody] CreateAccountTransactionRequest request, IMediator mediator, HttpContext ctx)
     {
-        var response = await mediator.Send(request);
-        if (response.IsFailure)
+        var result = await mediator.Send(request);
+        if (result.IsFailure)
         {
+            if (result.Error.Code == StatusCodes.Status422UnprocessableEntity)
+            {
+                return TypedResults.UnprocessableEntity(new ProblemDetails
+                {
+                    Title = result.Error.Title,
+                    Detail = result.Error.Description,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            
             return TypedResults.Conflict(new ProblemDetails
             {
-                Title = response.Error.Title,
-                Detail = response.Error.Description,
+                Title = result.Error.Title,
+                Detail = result.Error.Description,
                 Status = StatusCodes.Status409Conflict
             });
         }
-        var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.AccountGroupName}/{response.Value.MovimientoId}";
-        return TypedResults.Created(location, response.Value);
+        var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.AccountGroupName}/{result.Value.MovimientoId}";
+        return TypedResults.Created(location, result.Value);
     }
 }

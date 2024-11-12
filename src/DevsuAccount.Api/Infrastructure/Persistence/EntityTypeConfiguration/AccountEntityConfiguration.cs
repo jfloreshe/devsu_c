@@ -1,6 +1,7 @@
 ﻿using DevsuAccount.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DevsuAccount.Api.Infrastructure.Persistence.EntityTypeConfiguration;
 
@@ -27,5 +28,17 @@ public class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
             .WithOne(t => t.Account)
             .HasForeignKey(t => t.AccountId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        accountConfiguration.Property(t => t.AccountType)
+            .IsRequired()
+            .HasConversion(new AccountTypeConverter());
     }
+}
+
+public class AccountTypeConverter : ValueConverter<IAccountType, string>
+{
+    public AccountTypeConverter() : base(
+        vObject => vObject.Value,
+        vPrimitive => AccountTypeFactory.Create(vPrimitive).Value)
+    {}
 }

@@ -43,7 +43,13 @@ public class UpdateAccountRequestHandler : IRequestHandler<UpdateAccountRequest 
             return Result<UpdateAccountResult>.Failure(UpdateAccountErrors.AccountNotFound);
         }
 
-        account.AccountType = request.Tipo;
+        var accountTypeResult = AccountTypeFactory.Create(request.Tipo);
+        if (accountTypeResult.IsFailure)
+        {
+            return Result<UpdateAccountResult>.Failure(accountTypeResult.Error);
+        }
+        
+        account.AccountType = accountTypeResult.Value;
         account.OpeningBalance = request.SaldoInicial;
         account.CustomerId = request.ClienteId;
         account.State = request.Estado;

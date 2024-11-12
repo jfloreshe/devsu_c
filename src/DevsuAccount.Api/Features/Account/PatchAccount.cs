@@ -45,7 +45,12 @@ public class PatchAccountRequestHandler : IRequestHandler<PatchAccountRequest ,R
 
         if (request.Tipo != null)
         {
-            account.AccountType = request.Tipo;
+            var accountTypeResult = AccountTypeFactory.Create(request.Tipo);
+            if (accountTypeResult.IsFailure)
+            {
+                return Result<PAtchAccountResult>.Failure(accountTypeResult.Error);
+            }
+            account.AccountType = accountTypeResult.Value;
         }
         
         if (request.SaldoInicial != null)

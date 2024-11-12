@@ -44,20 +44,25 @@ public class CreateAccountRequestHandler : IRequestHandler<CreateAccountRequest 
             return Result<CreateAccountResult>.Failure(CreateAccountErrors.ExistingAccount(account.AccountNumber));
         }
         
-        var newAccount = new Models.Account(
+        var newAccountResult = Models.Account.Create(
             accountNumber: request.NumeroCuenta,
-            accountType: request.Tipo,
+            accountTypeRaw: request.Tipo,
             openingBalance: request.SaldoInicial,
             state: request.Estado,
             customerId: request.ClienteId
         );
+
+        if (newAccountResult.IsFailure)
+        {
+            return Result<CreateAccountResult>.Failure(newAccountResult.Error);
+        }
         
-        _accountRepository.AddAccount(newAccount);
+        _accountRepository.AddAccount(newAccountResult.Value);
         await _accountRepository.SaveEntities(cancellationToken);
         
         var result = new CreateAccountResult
         {
-            NumeroCuenta = newAccount.AccountNumber,
+            NumeroCuenta = newAccountResult.Value.AccountNumber,
         };
 
         return Result<CreateAccountResult>.Success(result);
