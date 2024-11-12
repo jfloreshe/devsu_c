@@ -66,8 +66,6 @@ public class AccountRepository : IAccountRepository
     public void DeleteAccountTransaction(AccountTransaction accountTransaction)
     {
         _ctx.Transactions.Remove(accountTransaction);
-        var a = _ctx.Entry(accountTransaction).Entity;
-        var b = 1;
     }
 
     public Task<int> SaveEntities(CancellationToken cancellationToken = default)

@@ -77,7 +77,7 @@ public class PatchAccountTransactionRequestHandler : IRequestHandler<PatchAccoun
             });
         }
 
-        request.Movimiento ??= transaction.TransactionValue;
+        request.Movimiento ??=  transaction.TransactionValue < 0 ? transaction.TransactionValue * -1 : transaction.TransactionValue;
 
         var transactionUpdatedResult = account.UpdateTransaction(request.MovimientoId, request.Tipo!, request.Movimiento!.Value);
         if (transactionUpdatedResult.IsFailure)

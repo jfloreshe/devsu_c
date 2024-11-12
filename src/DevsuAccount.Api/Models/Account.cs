@@ -160,7 +160,7 @@ public class Account : IAggregateRoot
                 previousBalance: currentTransaction.Balance,
                 newBalance: currentTransactionNewBalanceResult.Value);
         
-            currentTransaction.Logs.Add(transactionUpdateLog);
+            currentTransaction.Logs.Add(currentTransactionUpdateLog);
             currentTransaction.Balance = currentTransactionUpdateLog.NewBalance;
         }
 
