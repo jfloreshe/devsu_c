@@ -2,7 +2,7 @@
 using DevsuAccount.Api.Models;
 using MediatR;
 
-namespace DevsuAccount.Api.Features;
+namespace DevsuAccount.Api.Features.Account;
 
 public static class UpdateAccountErrors
 {

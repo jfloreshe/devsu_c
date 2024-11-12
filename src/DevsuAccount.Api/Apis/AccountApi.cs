@@ -1,4 +1,5 @@
 ﻿using DevsuAccount.Api.Features;
+using DevsuAccount.Api.Features.Account;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -108,6 +109,8 @@ public static class AccountApi
         NotFound<ProblemDetails>>>
     DeleteAccount([FromRoute] string numerCuenta, IMediator mediator)
     {
+        //This makes a hard delete (be careful using it)
+        //In case you need soft delete use PatchAccount or UpdateAccount changing the state should be enough
         var response = await mediator.Send(new DeleteAccountRequest { AccountNumber = numerCuenta });
         if (response.IsFailure)
         {

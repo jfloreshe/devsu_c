@@ -2,7 +2,7 @@
 using DevsuAccount.Api.Models;
 using MediatR;
 
-namespace DevsuAccount.Api.Features;
+namespace DevsuAccount.Api.Features.Account;
 
 public static class CreateAccountErrors
 {
@@ -44,7 +44,7 @@ public class CreateAccountRequestHandler : IRequestHandler<CreateAccountRequest 
             return Result<CreateAccountResult>.Failure(CreateAccountErrors.ExistingAccount(account.AccountNumber));
         }
         
-        var newAccount = new Account(
+        var newAccount = new Models.Account(
             accountNumber: request.NumeroCuenta,
             accountType: request.Tipo,
             openingBalance: request.SaldoInicial,
