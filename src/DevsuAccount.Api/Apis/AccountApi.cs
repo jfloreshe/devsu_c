@@ -1,5 +1,6 @@
 ﻿using DevsuAccount.Api.Features;
 using DevsuAccount.Api.Features.Account;
+using DevsuAccount.Api.Features.Account.AccountTransaction;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,7 @@ public static class AccountApi
     public static void MapAccountTransactionApi(this IEndpointRouteBuilder app)
     {
         var api = app.MapGroup(Routes.AccountTransactionGroupName);
+        api.MapPost("/", CreateAccountTransaction);
     }
     
     public static async Task<Results<
@@ -123,5 +125,24 @@ public static class AccountApi
         }
         
         return TypedResults.NoContent();
+    }
+    
+    public static async Task<Results<
+        Created<CreateAccountTransactionResult>,
+        Conflict<ProblemDetails>>>
+    CreateAccountTransaction([FromBody] CreateAccountTransactionRequest request, IMediator mediator, HttpContext ctx)
+    {
+        var response = await mediator.Send(request);
+        if (response.IsFailure)
+        {
+            return TypedResults.Conflict(new ProblemDetails
+            {
+                Title = response.Error.Title,
+                Detail = response.Error.Description,
+                Status = StatusCodes.Status409Conflict
+            });
+        }
+        var location = $"{ctx.Request.Scheme}://{ctx.Request.Host}/{Routes.AccountGroupName}/{response.Value.MovimientoId}";
+        return TypedResults.Created(location, response.Value);
     }
 }

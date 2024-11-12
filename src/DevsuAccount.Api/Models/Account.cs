@@ -25,4 +25,22 @@ public class Account : IAggregateRoot
         State = state;
         CustomerId = customerId;
     }
+
+    public Result<AccountTransaction> AddNewTransaction(string transactionType, decimal transactionValue)
+    {
+        //Account is the owner of transaction and must create it
+        
+        var previousBalance = Transactions.Count == 0
+            ? OpeningBalance
+            : Transactions.OrderByDescending(t => t.DateCreation)
+                .First()
+                .Balance;
+
+        var newTransaction = new AccountTransaction(Guid.NewGuid(), DateTime.Now, transactionType, transactionValue, previousBalance, AccountId);
+        //We need to find possible errors with the newTransaction, so it should be a result
+        
+        Transactions.Add(newTransaction);
+        
+        return Result<AccountTransaction>.Success(newTransaction);
+    }
 }

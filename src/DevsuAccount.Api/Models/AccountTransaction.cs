@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Devsu.Shared.Primitives;
 
 namespace DevsuAccount.Api.Models;
 
@@ -24,4 +25,20 @@ public class AccountTransaction
         AccountId = accountId;
     }
 
+}
+
+public static class AccountTransactionUnprocessableErrors
+{
+    public const string AccountTransactionCreation = "Creacion movimiento";
+    public static readonly Error AccountTransactionTypeNoValid = new(
+        AccountTransactionCreation,
+        $"El tipo de movimiento no es valido; Solo se aceptan los siguientes valores [deposito | retiro]",
+        StatusCodes.Status422UnprocessableEntity);
+}
+
+
+public static class AccountTransactionConstants
+{
+    public const string Withdraw = "RETIRO";
+    public const string Deposit = "DEPOSITO";
 }
