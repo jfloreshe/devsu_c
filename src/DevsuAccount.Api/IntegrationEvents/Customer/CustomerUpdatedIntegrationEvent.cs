@@ -37,8 +37,12 @@ public class CustomerUpdatedIntegrationEventHandler : INotificationHandler<Custo
                     State = request.State
                 }, cancellationToken);
             }
-
-            await _unitOfWork.CustomerRepository.UpdateCustomer(customer!, cancellationToken);
+            else
+            {
+                customer.Name = request.Name;
+                customer.State = request.State;
+                await _unitOfWork.CustomerRepository.UpdateCustomer(customer, cancellationToken);
+            }
             accounts.ForEach(a =>
             {
                 a.State = false;
