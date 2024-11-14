@@ -3,7 +3,6 @@ using DevsuAccount.Api.Infrastructure.Integration.RabbitMq;
 using DevsuAccount.Api.Infrastructure.Persistence;
 using DevsuAccount.Api.Models;
 using MassTransit;
-using MassTransit.Configuration;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +74,7 @@ public static class Extensions
         
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         builder.Services.AddHostedService<MessagePublisher>();//TODO delete
     }

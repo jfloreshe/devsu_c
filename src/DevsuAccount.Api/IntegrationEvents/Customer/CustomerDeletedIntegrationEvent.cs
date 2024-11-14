@@ -11,30 +11,33 @@ public class CustomerDeletedIntegrationEvent : INotification
 
 public class CustomerDeletedIntegrationEventHandler : INotificationHandler<CustomerDeletedIntegrationEvent>
 {
-    private readonly ICustomerRepository _customerRepository;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CustomerDeletedIntegrationEventHandler(ICustomerRepository customerRepository, IAccountRepository accountRepository)
+    public CustomerDeletedIntegrationEventHandler(IUnitOfWork unitOfWork)
     {
-        _customerRepository = customerRepository;
-        _accountRepository = accountRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(CustomerDeletedIntegrationEvent request, CancellationToken cancellationToken)
     {
-        var customer = await _customerRepository.FindCustomer(request.CustomerId, cancellationToken);
-        if (customer is not null)
+        var customer = await _unitOfWork.CustomerRepository.FindCustomer(request.CustomerId, cancellationToken);
+        var accounts = await _unitOfWork.AccountRepository.GetAccounts(request.CustomerId, cancellationToken);
+        var dbTransaction = new IUnitOfWork.DbTransaction<int>(async () =>
         {
-            _customerRepository.DeleteCustomer(customer);
-        }
+            if (customer is not null)
+            {
+                _unitOfWork.CustomerRepository.DeleteCustomer(customer);
+            }
 
-        var accounts = await _accountRepository.GetAccounts(request.CustomerId, cancellationToken);
-        foreach (var account in accounts)
-        {
-            _accountRepository.DeleteAccount(account);
-        }
+            foreach (var account in accounts)
+            {
+                _unitOfWork.AccountRepository.DeleteAccount(account);
+            }
+
+            return await _unitOfWork.SaveChanges();
+        });
         
-        
+        await _unitOfWork.ExecuteTransaction(dbTransaction);
     }
 }
 
