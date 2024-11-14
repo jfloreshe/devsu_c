@@ -23,7 +23,7 @@ Este proyecto está preparado para ser desplegado a través de **Docker Compose*
 
 ### Requisitos previos
 - Docker y Docker Compose instalados.
-- Tener SDK 8 de Net
+- Tener SDK para .Net 8
   
 ### Pasos de configuración y despliegue
 #### Despliegue Automático:
