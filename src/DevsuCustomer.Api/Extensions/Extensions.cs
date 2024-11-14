@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Devsu.Shared.BusEvent;
 using DevsuCustomer.Api.Infrastructure.Integration.RabbitMq;
 using DevsuCustomer.Api.Infrastructure.Persistence;
 using DevsuCustomer.Api.IntegrationEvents;

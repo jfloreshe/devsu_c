@@ -1,4 +1,4 @@
-﻿using DevsuAccount.Api.Infrastructure.Integration;
+﻿using Devsu.Shared.BusEvent;
 using DevsuAccount.Api.Infrastructure.Integration.RabbitMq;
 using DevsuAccount.Api.Infrastructure.Persistence;
 using DevsuAccount.Api.Models;
@@ -37,8 +37,8 @@ public static class Extensions
                     h.Password(settings.Password);
                 });
                 
-                cfg.Message<BusMessage>(x => x.SetEntityName(RabbitMqConstants.CustomerExchange));
-                cfg.Publish<BusMessage>(x => x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect);
+                cfg.Message<BusIntegrationEventMessage>(x => x.SetEntityName(RabbitMqConstants.CustomerExchange));
+                cfg.Publish<BusIntegrationEventMessage>(x => x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect);
                 
                 cfg.ReceiveEndpoint(RabbitMqConstants.ConsumerCustomerCreatedEndPoint, e =>
                 {

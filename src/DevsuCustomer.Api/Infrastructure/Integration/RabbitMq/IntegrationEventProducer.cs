@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Devsu.Shared.BusEvent;
 using DevsuCustomer.Api.IntegrationEvents;
 using DevsuCustomer.Api.Models.DomainEvents;
 using MassTransit;

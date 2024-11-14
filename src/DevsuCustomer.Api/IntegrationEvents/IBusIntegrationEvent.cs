@@ -7,4 +7,3 @@ public interface IBusIntegrationEvent
     Task PublishCustomerIntegrationEvent(CustomerDomainEvent newEvent,
         CancellationToken cancellationToken = default);
 }
-public record BusIntegrationEventMessage(DateTime sendDate, string message);
