@@ -1,5 +1,7 @@
 ﻿using Devsu.Shared.Primitives;
+using DevsuCustomer.Api.IntegrationEvents;
 using DevsuCustomer.Api.Models;
+using DevsuCustomer.Api.Models.DomainEvents;
 using MediatR;
 
 namespace DevsuCustomer.Api.Features;
@@ -31,10 +33,11 @@ public class PatchCustomerRequest : IRequest<Result<PatchCustomerResult>>
 public class PatchCustomerRequestHandler : IRequestHandler<PatchCustomerRequest, Result<PatchCustomerResult>>
 {
     private readonly ICustomerRepository _customerRepository;
-
-    public PatchCustomerRequestHandler(ICustomerRepository customerRepository)
+    private readonly IBusIntegrationEvent _busEvent;
+    public PatchCustomerRequestHandler(ICustomerRepository customerRepository, IBusIntegrationEvent busEvent)
     {
         _customerRepository = customerRepository;
+        _busEvent = busEvent;
     }
 
     public async Task<Result<PatchCustomerResult>> Handle(PatchCustomerRequest request, CancellationToken cancellationToken)
@@ -44,7 +47,8 @@ public class PatchCustomerRequestHandler : IRequestHandler<PatchCustomerRequest,
         {
             return Result<PatchCustomerResult>.Failure(PatchCustomerErrors.CustomerNotFound);
         }
-        
+
+        bool publlishIntegrationEvent = false;
         if (request.Contrasena != null)
         {
             customer.Password = request.Contrasena;
@@ -58,6 +62,7 @@ public class PatchCustomerRequestHandler : IRequestHandler<PatchCustomerRequest,
         if (request.Nombre != null)
         {
             customer.Name = request.Nombre;
+            publlishIntegrationEvent = true;
         }
         
         if (request.Genero != null)
@@ -83,10 +88,23 @@ public class PatchCustomerRequestHandler : IRequestHandler<PatchCustomerRequest,
         if (request.Estado != null)
         {
             customer.State = request.Estado.Value;
+            publlishIntegrationEvent = true;
         }
         
         _customerRepository.UpdateCustomer(customer);
+        
         await _customerRepository.SaveEntities(cancellationToken);
+
+        if (publlishIntegrationEvent)
+        {
+            //we should use outbox pattern here, but we are using an optimistic strategy
+            await _busEvent.PublishCustomerIntegrationEvent(new CustomerUpdatedDomainEvent
+            {
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                State = customer.State
+            }, cancellationToken);
+        }
         
         return Result<PatchCustomerResult>.Success(new PatchCustomerResult
         {

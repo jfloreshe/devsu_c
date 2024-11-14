@@ -1,4 +1,5 @@
 ﻿using Devsu.Shared.Primitives;
+using DevsuCustomer.Api.Models.DomainEvents;
 
 namespace DevsuCustomer.Api.Models;
 

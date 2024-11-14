@@ -6,7 +6,6 @@ namespace DevsuAccount.Api.IntegrationEvents.Customer;
 public class CustomerDeletedIntegrationEvent : INotification
 {
     public Guid CustomerId { get; set; }
-    public string Name { get; set; }
 }
 
 public class CustomerDeletedIntegrationEventHandler : INotificationHandler<CustomerDeletedIntegrationEvent>

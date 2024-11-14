@@ -37,8 +37,8 @@ public static class Extensions
                     h.Password(settings.Password);
                 });
                 
-                // cfg.Message<BusMessage>(x => x.SetEntityName(RabbitMqConstants.CustomerExchange));//TODO pass to publiser
-                // cfg.Publish<BusMessage>(x => x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect);//TODO pass to publiser
+                cfg.Message<BusMessage>(x => x.SetEntityName(RabbitMqConstants.CustomerExchange));
+                cfg.Publish<BusMessage>(x => x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect);
                 
                 cfg.ReceiveEndpoint(RabbitMqConstants.ConsumerCustomerCreatedEndPoint, e =>
                 {
@@ -75,8 +75,6 @@ public static class Extensions
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-        
-        builder.Services.AddHostedService<MessagePublisher>();//TODO delete
     }
 
     public static void AddApiMiddlewareException(this IApplicationBuilder app)

@@ -9,6 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MassTransit" Version="8.3.2-develop.2115" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.2-develop.2115" />
         <PackageReference Include="MediatR" Version="12.4.1" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
@@ -35,7 +37,6 @@
 
     <ItemGroup>
       <Folder Include="Infrastructure\Persistence\Migrations\" />
-      <Folder Include="IntegrationEvents\" />
     </ItemGroup>
 
     <ItemGroup>

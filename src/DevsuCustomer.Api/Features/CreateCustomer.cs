@@ -1,5 +1,7 @@
 ﻿using Devsu.Shared.Primitives;
+using DevsuCustomer.Api.IntegrationEvents;
 using DevsuCustomer.Api.Models;
+using DevsuCustomer.Api.Models.DomainEvents;
 using MediatR;
 
 namespace DevsuCustomer.Api.Features;
@@ -32,10 +34,12 @@ public class CreateCustomerRequest : IRequest<Result<CreateCustomerResult>>
 public class CreateCustomerRequestHandler : IRequestHandler<CreateCustomerRequest, Result<CreateCustomerResult>>
 {
     private readonly ICustomerRepository _customerRepository;
+    private readonly IBusIntegrationEvent _busEvent;
 
-    public CreateCustomerRequestHandler(ICustomerRepository customerRepository)
+    public CreateCustomerRequestHandler(ICustomerRepository customerRepository, IBusIntegrationEvent busEvent)
     {
         _customerRepository = customerRepository;
+        _busEvent = busEvent;
     }
 
     public async Task<Result<CreateCustomerResult>> Handle(CreateCustomerRequest request, CancellationToken cancellationToken = default)
@@ -65,8 +69,15 @@ public class CreateCustomerRequestHandler : IRequestHandler<CreateCustomerReques
         var newCustomer = newCustomerResult.Value;
 
         _customerRepository.AddCustomer(newCustomer);
-
+        
         await _customerRepository.SaveEntities(cancellationToken);
+        
+        //we should use outbox pattern here, but we are using an optimistic strategy
+        await _busEvent.PublishCustomerIntegrationEvent(new CustomerCreatedDomainEvent
+        {
+            CustomerId = newCustomer.CustomerId,
+            Name = newCustomer.Name
+        }, cancellationToken);
         
         return Result<CreateCustomerResult>.Success(new CreateCustomerResult
         {

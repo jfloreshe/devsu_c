@@ -1,6 +1,7 @@
 ﻿using Devsu.Shared.Primitives;
-using DevsuCustomer.Api.Infrastructure.Persistence;
+using DevsuCustomer.Api.IntegrationEvents;
 using DevsuCustomer.Api.Models;
+using DevsuCustomer.Api.Models.DomainEvents;
 using MediatR;
 
 namespace DevsuCustomer.Api.Features;
@@ -36,10 +37,11 @@ public class UpdateCustomerRequest : IRequest<Result<UpdateCustomerResult>>
 public class UpdateCustomerRequestHandler : IRequestHandler<UpdateCustomerRequest, Result<UpdateCustomerResult>>
 {
     private readonly ICustomerRepository _customerRepository;
-
-    public UpdateCustomerRequestHandler(ICustomerRepository customerRepository)
+    private readonly IBusIntegrationEvent _busEvent;
+    public UpdateCustomerRequestHandler(ICustomerRepository customerRepository, IBusIntegrationEvent busEvent)
     {
         _customerRepository = customerRepository;
+        _busEvent = busEvent;
     }
 
     public async Task<Result<UpdateCustomerResult>> Handle(UpdateCustomerRequest request, CancellationToken cancellationToken)
@@ -60,7 +62,17 @@ public class UpdateCustomerRequestHandler : IRequestHandler<UpdateCustomerReques
         customer.State = request.Estado;
         
         _customerRepository.UpdateCustomer(customer);
+      
         await _customerRepository.SaveEntities(cancellationToken);
+        
+        //we should use outbox pattern here, but we are using an optimistic strategy
+        //we need to handle only name or state change
+        await _busEvent.PublishCustomerIntegrationEvent(new CustomerUpdatedDomainEvent
+        {
+            CustomerId = customer.CustomerId,
+            Name = customer.Name,
+            State = customer.State
+        }, cancellationToken);
 
         return Result<UpdateCustomerResult>.Success(new UpdateCustomerResult
         {
