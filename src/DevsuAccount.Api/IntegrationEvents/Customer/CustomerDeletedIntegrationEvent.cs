@@ -21,7 +21,7 @@ public class CustomerDeletedIntegrationEventHandler : INotificationHandler<Custo
     public async Task Handle(CustomerDeletedIntegrationEvent request, CancellationToken cancellationToken)
     {
         var customer = await _unitOfWork.CustomerRepository.FindCustomer(request.CustomerId, cancellationToken);
-        var accounts = await _unitOfWork.AccountRepository.GetAccounts(request.CustomerId, cancellationToken);
+        var accounts = await _unitOfWork.AccountRepository.GetActiveAccounts(request.CustomerId, cancellationToken);
         var dbTransaction = new IUnitOfWork.DbTransaction<int>(async () =>
         {
             if (customer is not null)

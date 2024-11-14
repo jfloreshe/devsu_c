@@ -55,10 +55,10 @@ public class AccountRepository : IAccountRepository
         return account;
     }
 
-    public Task<List<Account>> GetAccounts(Guid accountTransactionId, CancellationToken cancellationToken = default)
+    public Task<List<Account>> GetActiveAccounts(Guid customerId, CancellationToken cancellationToken = default)
     {
         var accounts = _ctx.Accounts
-            .Where(a => a.Transactions.Any(t => t.TransactionId == accountTransactionId))
+            .Where(a => a.CustomerId == customerId && a.State == true)
             .ToListAsync(cancellationToken);
     
         return accounts ;

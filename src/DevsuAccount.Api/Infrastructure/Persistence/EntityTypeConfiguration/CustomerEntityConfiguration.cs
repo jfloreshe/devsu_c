@@ -14,5 +14,8 @@ public class CustomerEntityConfiguration : IEntityTypeConfiguration<AccountCusto
         customerConfiguration.Property(c => c.Name)
             .HasMaxLength(200)
             .IsUnicode();
+
+        customerConfiguration.Property(c => c.State)
+            .HasDefaultValue(true);
     }
 }

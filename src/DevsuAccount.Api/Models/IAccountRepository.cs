@@ -11,7 +11,7 @@ public interface IAccountRepository : IRepository<Account>
     void DeleteAccount(Account customer);
     void AddTransaction(AccountTransaction newTransactionValue);
     Task<Account?> FindAccount(Guid accountTransactionId, CancellationToken cancellationToken = default);
-    Task<List<Account>> GetAccounts(Guid accountTransactionId, CancellationToken cancellationToken = default);
+    Task<List<Account>> GetActiveAccounts(Guid accountTransactionId, CancellationToken cancellationToken = default);
     void DeleteAccountTransaction(AccountTransaction accountTransaction);
     Task<GetAccountStateReportResult> GetAccountState(Guid requestCustomerId, DateTime initialDate,
         DateTime finalDate, int page, int size, CancellationToken cancellationToken = default);

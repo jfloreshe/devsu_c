@@ -23,7 +23,8 @@ public class CustomerCreatedIntegrationEventHandler : INotificationHandler<Custo
         await _customerRepository.InsertCustomer(new AccountCustomer
         {
             CustomerId = request.CustomerId,
-            Name = request.Name
+            Name = request.Name,
+            State = true
         }, cancellationToken);
     }
 }

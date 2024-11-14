@@ -7,30 +7,47 @@ public class CustomerUpdatedIntegrationEvent : INotification
 {
     public Guid CustomerId { get; set; }
     public string Name { get; set; }
+    public bool State { get; set; }
 }
 
 public class CustomerUpdatedIntegrationEventHandler : INotificationHandler<CustomerUpdatedIntegrationEvent>
 {
-    private readonly ICustomerRepository _customerRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CustomerUpdatedIntegrationEventHandler(ICustomerRepository customerRepository)
+    public CustomerUpdatedIntegrationEventHandler(IUnitOfWork unitOfWork)
     {
-        _customerRepository = customerRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(CustomerUpdatedIntegrationEvent request, CancellationToken cancellationToken)
     {
-        var customer = await _customerRepository.FindCustomer(request.CustomerId, cancellationToken);
-        if (customer is null)
+        var customer = await _unitOfWork.CustomerRepository.FindCustomer(request.CustomerId, cancellationToken);
+        var accounts = !request.State 
+            ? await _unitOfWork.AccountRepository.GetActiveAccounts(request.CustomerId, cancellationToken) 
+            : [];
+
+        var dbTransaction = new IUnitOfWork.DbTransaction<int>(async () =>
         {
-            await _customerRepository.InsertCustomer(new AccountCustomer
+            if (customer is null)
             {
-                CustomerId = request.CustomerId,
-                Name = request.Name
-            }, cancellationToken);
-            return;
-        }
-        await _customerRepository.UpdateCustomer(customer, cancellationToken);
+                await _unitOfWork.CustomerRepository.InsertCustomer(new AccountCustomer
+                {
+                    CustomerId = request.CustomerId,
+                    Name = request.Name,
+                    State = request.State
+                }, cancellationToken);
+            }
+
+            await _unitOfWork.CustomerRepository.UpdateCustomer(customer!, cancellationToken);
+            accounts.ForEach(a =>
+            {
+                a.State = false;
+                _unitOfWork.AccountRepository.UpdateAccount(a);
+            });
+            return await _unitOfWork.SaveChanges();
+        });
+
+        await _unitOfWork.ExecuteTransaction(dbTransaction);
     }
 }
 
