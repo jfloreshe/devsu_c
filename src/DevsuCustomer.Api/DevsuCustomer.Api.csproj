@@ -35,6 +35,7 @@
 
     <ItemGroup>
       <Folder Include="Infrastructure\Persistence\Migrations\" />
+      <Folder Include="IntegrationEvents\" />
     </ItemGroup>
 
     <ItemGroup>

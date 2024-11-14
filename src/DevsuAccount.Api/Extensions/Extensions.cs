@@ -1,10 +1,13 @@
 ﻿using DevsuAccount.Api.Infrastructure.Integration;
+using DevsuAccount.Api.Infrastructure.Integration.RabbitMq;
 using DevsuAccount.Api.Infrastructure.Persistence;
 using DevsuAccount.Api.Models;
 using MassTransit;
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DevsuAccount.Api.Extensions;
 
@@ -13,21 +16,67 @@ public static class Extensions
     public static void AddApplicationServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(Program)));
-        // builder.Services.AddDbContext<AccountDbContext>(o =>
-        // {
-        //     o.EnableSensitiveDataLogging();
-        //     o.UseInMemoryDatabase("DevsuAccounts");
-        // });
         builder.Services.AddDbContext<AccountDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DevsuAccountDb")));
+        
+        //MassTransit RMQ
+        builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("MsgBroker"));
+        builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<RabbitMqSettings>>().Value);
+        
         builder.Services.AddMassTransit(iBusConfig =>
         {
             iBusConfig.SetKebabCaseEndpointNameFormatter();
-            iBusConfig.AddConsumer<CurrentTimeConsumer>();
-            iBusConfig.UsingInMemory((iBusContext, configInMemory) => configInMemory.ConfigureEndpoints(iBusContext));
+            iBusConfig.AddConsumer<CustomerCreatedIntegrationEventConsumer>();
+            iBusConfig.AddConsumer<CustomerUpdatedIntegrationEventConsumer>();
+            iBusConfig.AddConsumer<CustomerDeletedIntegrationEventConsumer>();
+            iBusConfig.UsingRabbitMq((context, cfg) =>
+            {
+                var settings = context.GetRequiredService<RabbitMqSettings>();
+                cfg.Host(settings.Host, settings.Port , settings.VirtualHost, h =>
+                {
+                    h.Username(settings.Username);
+                    h.Password(settings.Password);
+                });
+                
+                // cfg.Message<BusMessage>(x => x.SetEntityName(RabbitMqConstants.CustomerExchange));//TODO pass to publiser
+                // cfg.Publish<BusMessage>(x => x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect);//TODO pass to publiser
+                
+                cfg.ReceiveEndpoint(RabbitMqConstants.ConsumerCustomerCreatedEndPoint, e =>
+                {
+                    e.Bind(RabbitMqConstants.CustomerExchange, x =>
+                    {
+                        x.RoutingKey = RabbitMqConstants.ConsumerCustomerCreatedRoutingKey;
+                        x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect;
+                    });
+                    e.ConfigureConsumer<CustomerCreatedIntegrationEventConsumer>(context);
+                });
+                
+                cfg.ReceiveEndpoint(RabbitMqConstants.ConsumerCustomerUpdatedEndPoint, e =>
+                {
+                    e.Bind(RabbitMqConstants.CustomerExchange, x =>
+                    {
+                        x.RoutingKey = RabbitMqConstants.ConsumerCustomerUpdatedRoutingKey;
+                        x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect;
+                    });
+                    e.ConfigureConsumer<CustomerUpdatedIntegrationEventConsumer>(context);
+                });
+                
+                cfg.ReceiveEndpoint(RabbitMqConstants.ConsumerCustomerDeletedEndPoint, e =>
+                {
+                    e.Bind(RabbitMqConstants.CustomerExchange, x =>
+                    {
+                        x.RoutingKey = RabbitMqConstants.ConsumerCustomerDeletedRoutingKey;
+                        x.ExchangeType = RabbitMqConstants.ExchangeTypeDirect;
+                    });
+                    e.ConfigureConsumer<CustomerDeletedIntegrationEventConsumer>(context);
+                });
+            });
         });
+        
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-        builder.Services.AddHostedService<MessagePublisher>();
+        builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+        
+        builder.Services.AddHostedService<MessagePublisher>();//TODO delete
     }
 
     public static void AddApiMiddlewareException(this IApplicationBuilder app)

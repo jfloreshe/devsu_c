@@ -18,8 +18,7 @@ public class GetAccountStateReportDetailsResult
 }
 public class GetAccountStateReportResult
 {
-    public ICollection<GetAccountStateReportDetailsResult> Data { get; set; } =
-        new List<GetAccountStateReportDetailsResult>();
+    public List<GetAccountStateReportDetailsResult> Data { get; set; } = [];
     public int Pagina { get; set; }
     public int TamanoBatch { get; set; }
     public int NumeroTotalRegistros { get; set; }
@@ -37,10 +36,12 @@ public class GetAccountStateReportRequest : IRequest<GetAccountStateReportResult
 public class GetAccountStateReportRequestHandler : IRequestHandler<GetAccountStateReportRequest ,GetAccountStateReportResult>
 {
     private readonly IAccountRepository _accountRepository;
+    private readonly ICustomerRepository _customerRepository;
 
-    public GetAccountStateReportRequestHandler(IAccountRepository accountRepository)
+    public GetAccountStateReportRequestHandler(IAccountRepository accountRepository, ICustomerRepository customerRepository)
     {
         _accountRepository = accountRepository;
+        _customerRepository = customerRepository;
     }
 
     public async Task<GetAccountStateReportResult> Handle(GetAccountStateReportRequest request, 
@@ -52,6 +53,10 @@ public class GetAccountStateReportRequestHandler : IRequestHandler<GetAccountSta
         var size = request.Size ?? 10;
      
         var report = await _accountRepository.GetAccountState(request.CustomerId, initialDate, finalDate, page, size, cancellationToken);
+        
+        var customerAccount = await _customerRepository.FindCustomer(request.CustomerId, cancellationToken);
+        
+        report.Data.ForEach(a => a.Cliente = customerAccount?.Name ?? string.Empty);
         
         return report;
     }

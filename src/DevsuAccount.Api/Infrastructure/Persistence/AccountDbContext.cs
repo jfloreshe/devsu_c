@@ -8,7 +8,7 @@ public class AccountDbContext : DbContext
 {
     public DbSet<Account> Accounts { get; set; }
     public DbSet<AccountTransaction> Transactions { get; set; }
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<AccountCustomer> Customers { get; set; }
   
     public AccountDbContext(){}
     public AccountDbContext(DbContextOptions<AccountDbContext> options) : base(options) { }

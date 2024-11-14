@@ -29,15 +29,6 @@ public class AccountRepository : IAccountRepository
         _ctx.Accounts.Add(newAccount);
     }
 
-    public Task<Customer?> FindCustomer(Guid accountCustomerId, CancellationToken cancellationToken = default)
-    {
-        var customer = _ctx.Customers
-            .Where(c => c.CustomerId.Equals(accountCustomerId))
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return customer;
-    }
-
     public void UpdateAccount(Account account)
     {
         _ctx.Accounts.Update(account);
@@ -64,6 +55,15 @@ public class AccountRepository : IAccountRepository
         return account;
     }
 
+    public Task<List<Account>> GetAccounts(Guid accountTransactionId, CancellationToken cancellationToken = default)
+    {
+        var accounts = _ctx.Accounts
+            .Where(a => a.Transactions.Any(t => t.TransactionId == accountTransactionId))
+            .ToListAsync(cancellationToken);
+    
+        return accounts ;
+    }
+
     public void DeleteAccountTransaction(AccountTransaction accountTransaction)
     {
         _ctx.Transactions.Remove(accountTransaction);
@@ -73,8 +73,6 @@ public class AccountRepository : IAccountRepository
         DateTime finalDate, int page, int size,
         CancellationToken cancellationToken = default)
     {
-        var customer = await FindCustomer(requestCustomerId, cancellationToken);
-        
         //TODO: improve with raw query and indexes
         var totalTransactions = await _ctx.Transactions
             .AsSplitQuery()
@@ -102,8 +100,6 @@ public class AccountRepository : IAccountRepository
             })
             .ToListAsync(cancellationToken);
         
-        transactions.ForEach(t => t.Cliente = customer?.Name ?? string.Empty);
-
         GetAccountStateReportResult result = new()
         {
             Data = transactions,

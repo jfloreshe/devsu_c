@@ -1,6 +1,6 @@
 ﻿namespace DevsuAccount.Api.Models;
 
-public class Customer
+public class AccountCustomer
 {
     public Guid CustomerId { get; set; }
     public string Name { get; set; }

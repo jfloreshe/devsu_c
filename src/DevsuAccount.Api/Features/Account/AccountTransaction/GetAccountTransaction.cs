@@ -32,10 +32,12 @@ public class GetAccountTransactionRequest : IRequest<Result<GetAccountTransactio
 public class GetAccountTransactionRequestHandler : IRequestHandler<GetAccountTransactionRequest ,Result<GetAccountTransactionResult>>
 {
     private readonly IAccountRepository _accountRepository;
+    private readonly ICustomerRepository _customerRepository;
 
-    public GetAccountTransactionRequestHandler(IAccountRepository accountRepository)
+    public GetAccountTransactionRequestHandler(IAccountRepository accountRepository, ICustomerRepository customerRepository)
     {
         _accountRepository = accountRepository;
+        _customerRepository = customerRepository;
     }
 
     public async Task<Result<GetAccountTransactionResult>> Handle(GetAccountTransactionRequest transactionRequest, CancellationToken cancellationToken = default)
@@ -47,7 +49,7 @@ public class GetAccountTransactionRequestHandler : IRequestHandler<GetAccountTra
             return Result<GetAccountTransactionResult>.Failure(GetAccountTransactionErrors.AccountTransactionNotFound);
         }
 
-        var customerAccount = await _accountRepository.FindCustomer(account.CustomerId, cancellationToken);
+        var customerAccount = await _customerRepository.FindCustomer(account.CustomerId, cancellationToken);
         var accountTransaction = account.Transactions.First();
         
         return Result<GetAccountTransactionResult>.Success(new GetAccountTransactionResult
