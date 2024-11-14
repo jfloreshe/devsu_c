@@ -8,6 +8,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/DevsuAccount.Api/DevsuAccount.Api.csproj", "src/DevsuAccount.Api/"]
+COPY ["src/Devsu.Shared/Devsu.Shared.csproj", "src/Devsu.Shared/"]
 RUN dotnet restore "src/DevsuAccount.Api/DevsuAccount.Api.csproj"
 COPY . .
 WORKDIR "/src/src/DevsuAccount.Api"

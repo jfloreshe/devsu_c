@@ -15,6 +15,8 @@
     volumes:
       - D:\docker-volume\sqlserver-db\data:/var/opt/mssql/data
       - D:\docker-volume\sqlserver-db\logs:/var/opt/mssql/logs
+    networks:
+      - devsu_network
                 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -22,3 +24,38 @@
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - devsu_network
+           
+  app-devsucustomer-api:
+    build:
+      context: ../.
+      dockerfile: ./src/DevsuCustomer.Api/Dockerfile
+    container_name: 'devsucustomer-api'
+    depends_on:
+      - rabbitmq
+      - mssql
+    ports:
+      - "8090:8080"
+      - "8091:8081"
+    networks:
+      - devsu_network
+        
+  app-devsuaccount-api:
+    build:
+      context: ../.
+      dockerfile: ./src/DevsuAccount.Api/Dockerfile
+    container_name: 'devsuaccount-api'
+    depends_on:
+      - rabbitmq
+      - mssql
+      - app-devsucustomer-api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    networks:
+      - devsu_network
+  
+networks:
+  devsu_network:
+    driver: bridge

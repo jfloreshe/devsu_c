@@ -13,7 +13,7 @@ var app = builder.Build();
 app.AddApiMiddlewareException();
 app.MapCustomerApi();
 
-if (app.Environment.IsDevelopment())
+if (builder.Configuration.GetValue<bool>("Development"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();

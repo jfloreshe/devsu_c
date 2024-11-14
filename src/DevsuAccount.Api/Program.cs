@@ -15,7 +15,7 @@ app.MapAccountApi();
 app.MapAccountTransactionApi();
 app.MapAccountReports();
 
-if (app.Environment.IsDevelopment())
+if (builder.Configuration.GetValue<bool>("Development"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
