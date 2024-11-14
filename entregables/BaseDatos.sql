@@ -1,9 +1,11 @@
+--CUSTOMER DB--
+
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 BEGIN
-CREATE TABLE [__EFMigrationsHistory] (
-    [MigrationId] nvarchar(150) NOT NULL,
-    [ProductVersion] nvarchar(32) NOT NULL,
-    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+    CREATE TABLE [__EFMigrationsHistory] (
+        [MigrationId] nvarchar(150) NOT NULL,
+        [ProductVersion] nvarchar(32) NOT NULL,
+        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
     );
 END;
 GO
@@ -20,7 +22,7 @@ CREATE TABLE [People] (
     [Address] nvarchar(200) NOT NULL,
     [Phone] varchar(50) NOT NULL,
     CONSTRAINT [PK_People] PRIMARY KEY ([PersonId])
-    );
+);
 GO
 
 CREATE TABLE [Customers] (
@@ -30,7 +32,7 @@ CREATE TABLE [Customers] (
     [State] bit NOT NULL,
     CONSTRAINT [PK_Customers] PRIMARY KEY ([PersonId]),
     CONSTRAINT [FK_Customers_People_PersonId] FOREIGN KEY ([PersonId]) REFERENCES [People] ([PersonId]) ON DELETE CASCADE
-    );
+);
 GO
 
 CREATE UNIQUE INDEX [IX_Customers_CustomerId] ON [Customers] ([CustomerId]) WHERE [CustomerId] IS NOT NULL;
@@ -46,13 +48,14 @@ GO
 COMMIT;
 GO
 
------------------------------------------------MS Account
+
+--ACCOUNT DB--
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 BEGIN
-CREATE TABLE [__EFMigrationsHistory] (
-    [MigrationId] nvarchar(150) NOT NULL,
-    [ProductVersion] nvarchar(32) NOT NULL,
-    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+    CREATE TABLE [__EFMigrationsHistory] (
+        [MigrationId] nvarchar(150) NOT NULL,
+        [ProductVersion] nvarchar(32) NOT NULL,
+        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
     );
 END;
 GO
@@ -68,14 +71,14 @@ CREATE TABLE [Accounts] (
     [State] bit NOT NULL,
     [CustomerId] uniqueidentifier NOT NULL,
     CONSTRAINT [PK_Accounts] PRIMARY KEY ([AccountId])
-    );
+);
 GO
 
 CREATE TABLE [Customers] (
     [CustomerId] uniqueidentifier NOT NULL,
     [Name] nvarchar(200) NOT NULL,
     CONSTRAINT [PK_Customers] PRIMARY KEY ([CustomerId])
-    );
+);
 GO
 
 CREATE TABLE [Transactions] (
@@ -87,7 +90,7 @@ CREATE TABLE [Transactions] (
     [AccountId] bigint NOT NULL,
     CONSTRAINT [PK_Transactions] PRIMARY KEY ([TransactionId]),
     CONSTRAINT [FK_Transactions_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([AccountId]) ON DELETE CASCADE
-    );
+);
 GO
 
 CREATE TABLE [AccountTransactionLog] (
@@ -102,7 +105,7 @@ CREATE TABLE [AccountTransactionLog] (
     [NewBalance] decimal(18,2) NOT NULL,
     CONSTRAINT [PK_AccountTransactionLog] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_AccountTransactionLog_Transactions_TransactionId] FOREIGN KEY ([TransactionId]) REFERENCES [Transactions] ([TransactionId]) ON DELETE CASCADE
-    );
+);
 GO
 
 CREATE INDEX [IX_AccountTransactionLog_TransactionId] ON [AccountTransactionLog] ([TransactionId]);
@@ -123,3 +126,17 @@ GO
 
 COMMIT;
 GO
+
+BEGIN TRANSACTION;
+GO
+
+ALTER TABLE [Customers] ADD [State] bit NOT NULL DEFAULT CAST(1 AS bit);
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20241114053257_AddSateCustomer', N'8.0.10');
+GO
+
+COMMIT;
+GO
+
