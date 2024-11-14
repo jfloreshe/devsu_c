@@ -5,6 +5,7 @@
   - Docker Compose
 - RabbitMQ
 - SQL Server
+- XUnit (Testing)
 
 ## Descripción
 Este repositorio contiene dos microservicios independientes: Clientes y Cuentas. La comunicación asíncrona entre ellos se realiza mediante RabbitMQ, permitiendo el intercambio de eventos del dominio del microservicio de Clientes (Productor). Al crear, actualizar o eliminar un cliente, se envía un evento al microservicio de Cuentas (Consumidor) para asegurar la consistencia de datos en los reportes de transacciones.
